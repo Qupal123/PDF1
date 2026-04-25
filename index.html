@@ -1,0 +1,2958 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>PDF Scanner</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0b0f14;
+      --bg-2: #121820;
+      --panel: rgba(18, 24, 32, .72);
+      --panel-strong: rgba(18, 24, 32, .94);
+      --text: #f4f7fb;
+      --muted: #a8b2c0;
+      --line: rgba(255, 255, 255, .13);
+      --accent: #24c6dc;
+      --accent-2: #ffb347;
+      --danger: #ff5c7a;
+      --ok: #47d18c;
+      --shadow: 0 18px 60px rgba(0, 0, 0, .34);
+      --radius: 8px;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-top: env(safe-area-inset-top, 0px);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    [data-theme="light"] {
+      color-scheme: light;
+      --bg: #f3f6f9;
+      --bg-2: #e9eef4;
+      --panel: rgba(255, 255, 255, .78);
+      --panel-strong: rgba(255, 255, 255, .96);
+      --text: #14191f;
+      --muted: #5f6c7a;
+      --line: rgba(20, 25, 31, .14);
+      --shadow: 0 18px 60px rgba(30, 47, 69, .18);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { width: 100%; min-height: 100%; margin: 0; background: var(--bg); color: var(--text); }
+    body { overflow-x: hidden; }
+    button, input, select { font: inherit; }
+    button { -webkit-tap-highlight-color: transparent; }
+    .app {
+      min-height: 100dvh;
+      background:
+        linear-gradient(180deg, rgba(36, 198, 220, .08), transparent 34%),
+        linear-gradient(145deg, var(--bg), var(--bg-2));
+      padding-bottom: calc(86px + var(--safe-bottom));
+    }
+
+    .camera {
+      position: relative;
+      min-height: 58dvh;
+      height: min(72dvh, 760px);
+      overflow: hidden;
+      background: #05070a;
+      border-bottom: 1px solid var(--line);
+    }
+
+    video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      background: #05070a;
+    }
+
+    .camera-shade {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(180deg, rgba(0, 0, 0, .48), transparent 22%, transparent 70%, rgba(0, 0, 0, .58));
+    }
+
+    .topbar {
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      top: calc(10px + var(--safe-top));
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .brand-mark {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background:
+        linear-gradient(135deg, var(--accent), #6ee7b7 52%, var(--accent-2));
+      position: relative;
+      flex: 0 0 auto;
+    }
+
+    .brand-mark::after {
+      content: "";
+      position: absolute;
+      inset: 6px;
+      border: 2px solid rgba(10, 20, 25, .72);
+      border-radius: 3px;
+    }
+
+    .brand-text { min-width: 0; }
+    .brand-title { font-weight: 750; letter-spacing: 0; line-height: 1; white-space: nowrap; }
+    .brand-subtitle { color: var(--muted); font-size: 12px; line-height: 1.2; margin-top: 2px; white-space: nowrap; }
+
+    .topbar-spacer { flex: 1; }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-height: 38px;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      color: var(--text);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+      white-space: nowrap;
+    }
+
+    .pill strong { font-weight: 760; }
+    .pill.ok { color: var(--ok); }
+    .pill.warn { color: var(--accent-2); }
+    .icon-button {
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      color: var(--text);
+      background: var(--panel);
+      display: inline-grid;
+      place-items: center;
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+      cursor: pointer;
+    }
+
+    .icon-button:hover, .pill:hover, .primary:hover, .secondary:hover, .segment button:hover { border-color: rgba(36, 198, 220, .55); }
+    .icon-button:active, .primary:active, .secondary:active, .capture:active { transform: translateY(1px) scale(.99); }
+
+    .camera-state {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      display: grid;
+      place-items: center;
+      padding: 28px;
+      text-align: center;
+      background: radial-gradient(circle at center, rgba(36, 198, 220, .12), rgba(0, 0, 0, .58));
+    }
+
+    .camera-state.hidden { display: none; }
+    .state-box {
+      max-width: 420px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel-strong);
+      backdrop-filter: blur(20px);
+      box-shadow: var(--shadow);
+    }
+
+    .state-box h2 { margin: 0 0 8px; font-size: 18px; }
+    .state-box p { margin: 0; color: var(--muted); line-height: 1.45; }
+    .state-actions { display: flex; gap: 8px; justify-content: center; margin-top: 14px; flex-wrap: wrap; }
+
+    .live-svg {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .live-svg polygon {
+      fill: rgba(36, 198, 220, .08);
+      stroke: rgba(36, 198, 220, .95);
+      stroke-width: 2.5;
+      vector-effect: non-scaling-stroke;
+      filter: drop-shadow(0 0 12px rgba(36, 198, 220, .55));
+    }
+
+    .capture-row {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: calc(14px + var(--safe-bottom));
+      z-index: 6;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 18px;
+      padding: 0 18px;
+    }
+
+    .capture {
+      width: 84px;
+      height: 84px;
+      border-radius: 50%;
+      border: 4px solid rgba(255, 255, 255, .84);
+      background:
+        radial-gradient(circle, #fff 0 34px, rgba(255, 255, 255, .2) 35px);
+      box-shadow: 0 14px 44px rgba(0, 0, 0, .44), inset 0 0 0 8px rgba(255, 255, 255, .22);
+      cursor: pointer;
+    }
+
+    .capture[disabled] { opacity: .48; cursor: not-allowed; }
+
+    .quick-button {
+      justify-self: center;
+      min-width: 46px;
+      height: 46px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      color: var(--text);
+      background: var(--panel);
+      backdrop-filter: blur(16px);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 0 12px;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+    }
+
+    .flash {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      pointer-events: none;
+      background: white;
+      opacity: 0;
+    }
+
+    .flash.show { animation: flash .34s ease-out; }
+    @keyframes flash {
+      0% { opacity: .9; }
+      100% { opacity: 0; }
+    }
+
+    .drop-catcher {
+      position: fixed;
+      inset: 0;
+      z-index: 70;
+      display: none;
+      place-items: center;
+      padding: 26px;
+      background: rgba(2, 6, 10, .72);
+      backdrop-filter: blur(8px);
+    }
+
+    .drop-catcher.active { display: grid; }
+    .drop-card {
+      width: min(520px, 100%);
+      min-height: 190px;
+      border: 2px dashed rgba(36, 198, 220, .78);
+      border-radius: var(--radius);
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 24px;
+      background: var(--panel-strong);
+      box-shadow: var(--shadow);
+    }
+
+    .workspace {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 14px 12px 0;
+      display: grid;
+      gap: 12px;
+    }
+
+    .section {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .section-header {
+      min-height: 48px;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .section-title {
+      font-weight: 760;
+      margin-right: auto;
+    }
+
+    .editor-stage {
+      position: relative;
+      min-height: 300px;
+      height: clamp(320px, 54dvh, 720px);
+      background:
+        linear-gradient(45deg, rgba(255, 255, 255, .045) 25%, transparent 25% 75%, rgba(255, 255, 255, .045) 75%),
+        linear-gradient(45deg, rgba(255, 255, 255, .045) 25%, transparent 25% 75%, rgba(255, 255, 255, .045) 75%),
+        rgba(0, 0, 0, .2);
+      background-size: 22px 22px;
+      background-position: 0 0, 11px 11px;
+      overflow: hidden;
+      touch-action: none;
+    }
+
+    .editor-stage.empty {
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 24px;
+      color: var(--muted);
+    }
+
+    #editorCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .corner-svg {
+      position: absolute;
+      inset: 0;
+      z-index: 4;
+      width: 100%;
+      height: 100%;
+      display: none;
+      touch-action: none;
+    }
+
+    .corner-svg.active { display: block; }
+    .corner-svg .shade { fill: rgba(0, 0, 0, .54); fill-rule: evenodd; }
+    .corner-svg polygon {
+      fill: rgba(36, 198, 220, .07);
+      stroke: var(--accent);
+      stroke-width: 2;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .corner-svg circle.hit {
+      fill: transparent;
+      stroke: transparent;
+      cursor: grab;
+      pointer-events: all;
+    }
+
+    .corner-svg circle.dot {
+      fill: var(--accent);
+      stroke: white;
+      stroke-width: 2.5;
+      filter: drop-shadow(0 4px 10px rgba(0, 0, 0, .42));
+      pointer-events: none;
+    }
+
+    .controls {
+      padding: 12px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .segment {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .segment button {
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, .05);
+      color: var(--text);
+      cursor: pointer;
+      padding: 6px 8px;
+      white-space: normal;
+      line-height: 1.1;
+    }
+
+    .segment button.active {
+      border-color: rgba(36, 198, 220, .9);
+      background: rgba(36, 198, 220, .18);
+      color: var(--text);
+    }
+
+    .segment button.locked {
+      opacity: .66;
+      background: rgba(255, 179, 71, .12);
+    }
+
+    .sliders {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .slider {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 10px;
+      background: rgba(255, 255, 255, .04);
+    }
+
+    .slider label {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .primary, .secondary, .danger {
+      min-height: 40px;
+      border-radius: var(--radius);
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: var(--text);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .primary {
+      border-color: rgba(36, 198, 220, .62);
+      background: linear-gradient(135deg, rgba(36, 198, 220, .95), rgba(71, 209, 140, .88));
+      color: #061116;
+      font-weight: 760;
+    }
+
+    .secondary { background: rgba(255, 255, 255, .06); }
+    .danger { background: rgba(255, 92, 122, .14); border-color: rgba(255, 92, 122, .42); color: var(--danger); }
+    .primary[disabled], .secondary[disabled], .danger[disabled] { opacity: .5; cursor: not-allowed; transform: none; }
+
+    .grid {
+      padding: 12px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+      gap: 10px;
+      min-height: 146px;
+    }
+
+    .page-card {
+      position: relative;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, .05);
+      overflow: hidden;
+      cursor: pointer;
+      min-height: 156px;
+    }
+
+    .page-card.active {
+      border-color: rgba(36, 198, 220, .9);
+      box-shadow: 0 0 0 2px rgba(36, 198, 220, .15);
+    }
+
+    .page-card.dragging { opacity: .46; }
+    .thumb-wrap {
+      aspect-ratio: 1 / 1.25;
+      background: rgba(0, 0, 0, .18);
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+
+    .thumb-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .page-meta {
+      min-height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 4px;
+      padding: 5px 6px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .mini-actions { display: flex; gap: 4px; }
+    .mini-actions button {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      border: 1px solid var(--line);
+      color: var(--text);
+      background: rgba(255, 255, 255, .07);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+    }
+
+    .empty-grid {
+      grid-column: 1 / -1;
+      min-height: 126px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      color: var(--muted);
+      border: 1px dashed var(--line);
+      border-radius: var(--radius);
+      padding: 18px;
+    }
+
+    .pdf-panel {
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .pdf-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 10px;
+      background: rgba(255, 255, 255, .04);
+    }
+
+    .pdf-row span { color: var(--muted); }
+
+    .bottom-nav {
+      position: fixed;
+      z-index: 50;
+      left: 10px;
+      right: 10px;
+      bottom: calc(10px + var(--safe-bottom));
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel-strong);
+      backdrop-filter: blur(22px);
+      box-shadow: var(--shadow);
+    }
+
+    .bottom-nav button {
+      min-height: 48px;
+      border: 1px solid transparent;
+      border-radius: var(--radius);
+      color: var(--muted);
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      font-size: 12px;
+    }
+
+    .bottom-nav button svg { width: 20px; height: 20px; }
+    .bottom-nav button.active {
+      color: var(--text);
+      border-color: rgba(36, 198, 220, .45);
+      background: rgba(36, 198, 220, .12);
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 90;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      background: rgba(0, 0, 0, .58);
+      backdrop-filter: blur(8px);
+      padding: 12px;
+    }
+
+    .modal-backdrop.open { display: flex; }
+    .modal {
+      width: min(620px, 100%);
+      max-height: min(84dvh, 760px);
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel-strong);
+      box-shadow: var(--shadow);
+    }
+
+    .modal-header {
+      min-height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .modal-header h2 { margin: 0; font-size: 18px; }
+    .modal-body { padding: 12px; display: grid; gap: 12px; }
+    .notice {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 12px;
+      background: rgba(255, 255, 255, .05);
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .notice strong { color: var(--text); }
+    .copy-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 8px;
+      background: rgba(255, 255, 255, .04);
+    }
+
+    .copy-value {
+      min-width: 0;
+      overflow-wrap: anywhere;
+      font-weight: 720;
+    }
+
+    .input-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+    }
+
+    .text-input {
+      min-height: 42px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      color: var(--text);
+      background: rgba(255, 255, 255, .06);
+      padding: 0 12px;
+      outline: none;
+      text-transform: uppercase;
+    }
+
+    .text-input:focus { border-color: rgba(36, 198, 220, .72); }
+
+    .loader {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: none;
+      place-items: center;
+      background: rgba(0, 0, 0, .42);
+      backdrop-filter: blur(5px);
+      pointer-events: none;
+    }
+
+    .loader.show { display: grid; }
+    .loader-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel-strong);
+      box-shadow: var(--shadow);
+    }
+
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 3px solid rgba(255, 255, 255, .2);
+      border-top-color: var(--accent);
+      animation: spin .8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .toasts {
+      position: fixed;
+      z-index: 110;
+      left: 12px;
+      right: 12px;
+      bottom: calc(94px + var(--safe-bottom));
+      display: grid;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .toast {
+      justify-self: center;
+      max-width: min(520px, 100%);
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel-strong);
+      color: var(--text);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+      animation: toast-in .18s ease-out;
+    }
+
+    .toast.ok { border-color: rgba(71, 209, 140, .48); }
+    .toast.warn { border-color: rgba(255, 179, 71, .54); }
+    .toast.danger { border-color: rgba(255, 92, 122, .5); }
+    @keyframes toast-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    .hidden { display: none !important; }
+    .desktop-only { display: none; }
+
+    @media (min-width: 900px) {
+      .app { padding-bottom: 94px; }
+      .camera { height: 54dvh; min-height: 460px; }
+      .workspace {
+        grid-template-columns: minmax(0, 1.22fr) minmax(330px, .78fr);
+        align-items: start;
+      }
+      .editor-section { grid-row: span 2; }
+      .desktop-only { display: inline-flex; }
+      .modal-backdrop { align-items: center; }
+      .toasts { bottom: 98px; }
+    }
+
+    @media (max-width: 640px) {
+      .brand-subtitle { display: none; }
+      .pill .soft-label { display: none; }
+      .topbar { gap: 6px; left: 8px; right: 8px; }
+      .brand { padding: 8px; }
+      .capture-row { gap: 10px; padding: 0 10px; }
+      .quick-button span { display: none; }
+      .segment { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .sliders { grid-template-columns: 1fr; }
+      .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .input-row, .copy-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body data-theme="dark">
+  <div class="app">
+    <section class="camera" id="cameraSection">
+      <video id="video" autoplay muted playsinline></video>
+      <div class="camera-shade"></div>
+      <svg class="live-svg" id="liveSvg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        <polygon id="livePolygon" points="" class="hidden"></polygon>
+      </svg>
+
+      <div class="topbar">
+        <div class="brand" aria-label="PDF Scanner">
+          <div class="brand-mark"></div>
+          <div class="brand-text">
+            <div class="brand-title">PDF Scanner</div>
+            <div class="brand-subtitle">сканирование документов</div>
+          </div>
+        </div>
+        <div class="topbar-spacer"></div>
+        <button class="pill" id="premiumBtn" type="button" title="Premium">
+          <span id="premiumBadge">Free</span>
+        </button>
+        <div class="pill" title="Страницы"><strong id="pageCount">0</strong><span>/ 25</span></div>
+        <button class="icon-button" id="themeBtn" type="button" title="Тема" aria-label="Переключить тему">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 3v2.2M12 18.8V21M4.2 4.2l1.6 1.6M18.2 18.2l1.6 1.6M3 12h2.2M18.8 12H21M4.2 19.8l1.6-1.6M18.2 5.8l1.6-1.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="camera-state" id="cameraState">
+        <div class="state-box">
+          <div class="spinner" style="margin:0 auto 12px"></div>
+          <h2 id="cameraStateTitle">Запуск камеры</h2>
+          <p id="cameraStateText">Разрешите доступ к камере. Если камера недоступна, можно загрузить изображения через галерею или перетащить файлы.</p>
+          <div class="state-actions">
+            <button class="secondary" id="retryCameraBtn" type="button">Повторить</button>
+            <button class="secondary" id="iosCaptureBtn" type="button">Снять через камеру</button>
+            <button class="primary" id="stateUploadBtn" type="button">Выбрать изображения</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="capture-row">
+        <button class="quick-button" id="uploadBtn" type="button" title="Галерея">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v13a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 18.5v-13Z" stroke="currentColor" stroke-width="1.8"/>
+            <path d="m5 17 4.5-4.5 3.3 3.3 2-2L20 19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="15.5" cy="8" r="1.5" fill="currentColor"/>
+          </svg>
+          <span>Галерея</span>
+        </button>
+        <button class="capture" id="captureBtn" type="button" aria-label="Сделать снимок"></button>
+        <button class="quick-button" id="nextScanBtn" type="button" title="Следующий скан">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Следующий</span>
+        </button>
+      </div>
+    </section>
+
+    <main class="workspace">
+      <section class="section editor-section" id="editorSection">
+        <div class="section-header">
+          <div class="section-title">Редактор</div>
+          <button class="secondary" id="cornerModeBtn" type="button">Углы</button>
+          <button class="secondary" id="applyCornersBtn" type="button">Применить углы</button>
+          <button class="secondary" id="rotateCurrentBtn" type="button">Повернуть</button>
+        </div>
+        <div class="editor-stage empty" id="editorStage">
+          <canvas id="editorCanvas"></canvas>
+          <svg class="corner-svg" id="cornerSvg" aria-hidden="true">
+            <path class="shade" id="cornerShade"></path>
+            <polygon id="cornerPolygon" points=""></polygon>
+            <g id="cornerHandles"></g>
+          </svg>
+          <div id="editorEmpty">Сделайте снимок или загрузите изображение. Страница появится здесь для проверки углов и обработки.</div>
+        </div>
+        <div class="controls">
+          <div class="segment" id="filterSegment">
+            <button type="button" data-filter="original">Оригинал</button>
+            <button type="button" data-filter="color">Цветной</button>
+            <button type="button" data-filter="gray">Grayscale</button>
+            <button type="button" data-filter="bw">Ч/Б документ</button>
+            <button type="button" data-filter="super">Суперскан</button>
+          </div>
+          <div class="sliders" id="sliders"></div>
+          <div class="actions">
+            <button class="primary" id="applyAllBtn" type="button">Применить ко всем</button>
+            <button class="secondary" id="resetSettingsBtn" type="button">Сбросить настройки</button>
+            <button class="secondary" id="saveStateBtn" type="button">Сохранить</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="gallerySection">
+        <div class="section-header">
+          <div class="section-title">Страницы</div>
+          <button class="secondary desktop-only" id="clearPagesBtn" type="button">Очистить</button>
+        </div>
+        <div class="grid" id="pagesGrid"></div>
+      </section>
+
+      <section class="section" id="pdfSection">
+        <div class="section-header">
+          <div class="section-title">PDF</div>
+        </div>
+        <div class="pdf-panel">
+          <div class="pdf-row">
+            <div>
+              <strong>A4 PDF</strong><br>
+              <span id="pdfQualityText">Free: стандартное качество</span>
+            </div>
+            <button class="primary" id="downloadPdfBtn" type="button">Скачать PDF</button>
+          </div>
+          <div class="pdf-row">
+            <div>
+              <strong>Premium</strong><br>
+              <span>Цветной Суперскан, 25 страниц, все фильтры, 4K-превью и PDF до 8K</span>
+            </div>
+            <button class="secondary" id="openPremiumBtn" type="button">Открыть</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="Навигация">
+      <button type="button" data-jump="cameraSection" class="active">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 8.5A2.5 2.5 0 0 1 6.5 6H8l1.3-2h5.4L16 6h1.5A2.5 2.5 0 0 1 20 8.5v8A2.5 2.5 0 0 1 17.5 19h-11A2.5 2.5 0 0 1 4 16.5v-8Z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12.5" r="3.4" stroke="currentColor" stroke-width="1.8"/></svg>
+        Камера
+      </button>
+      <button type="button" data-jump="gallerySection">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 7h12v13H8zM4 4h12v3M4 4v13h4" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        Галерея
+      </button>
+      <button type="button" data-jump="pdfSection">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 3h7l4 4v14H7z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M14 3v5h5M9.5 14h5M9.5 17h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        PDF
+      </button>
+    </nav>
+  </div>
+
+  <input class="hidden" id="fileInput" type="file" accept="image/*" multiple>
+  <input class="hidden" id="captureFileInput" type="file" accept="image/*" capture="environment">
+
+  <div class="drop-catcher" id="dropCatcher">
+    <div class="drop-card">
+      <div>
+        <h2>Отпустите изображения</h2>
+        <p>Поддерживаются JPG, PNG, WEBP и BMP. Документы будут найдены и добавлены в очередь сканирования.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="premiumModal" role="dialog" aria-modal="true" aria-labelledby="premiumTitle">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="premiumTitle">Premium доступ</h2>
+        <button class="icon-button" type="button" data-close-modal="premiumModal" aria-label="Закрыть">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="notice">
+          <strong>Оплата вручную.</strong><br>
+          Переведите оплату на карту, затем отправьте скрин оплаты на email. После проверки вы получите промокод.
+        </div>
+        <div class="copy-row">
+          <div>
+            <div class="soft-label">Карта</div>
+            <div class="copy-value" id="cardNumber">2200 1546 4888 2743</div>
+          </div>
+          <button class="secondary" id="copyCardBtn" type="button">Скопировать карту</button>
+        </div>
+        <div class="copy-row">
+          <div>
+            <div class="soft-label">Email</div>
+            <div class="copy-value" id="supportEmail">supportpays@icloud.com</div>
+          </div>
+          <button class="secondary" id="copyEmailBtn" type="button">Скопировать email</button>
+        </div>
+        <div class="notice" id="premiumStatusText">Free режим: 5 страниц, стандартный PDF, базовые фильтры.</div>
+        <button class="primary" id="havePromoBtn" type="button">У меня есть промокод</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="promoModal" role="dialog" aria-modal="true" aria-labelledby="promoTitle">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="promoTitle">Активация промокода</h2>
+        <button class="icon-button" type="button" data-close-modal="promoModal" aria-label="Закрыть">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="input-row">
+          <input class="text-input" id="promoInput" type="text" inputmode="latin" autocomplete="one-time-code" placeholder="PDF-XXXX-XXXX-XXXX">
+          <button class="primary" id="activatePromoBtn" type="button">Активировать</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="loader" id="loader">
+    <div class="loader-card">
+      <div class="spinner"></div>
+      <div id="loaderText">Обработка</div>
+    </div>
+  </div>
+  <div class="toasts" id="toasts"></div>
+  <div class="flash" id="flash"></div>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const STORE = {
+        pages: "pdfScanner.pages.v1",
+        settings: "pdfScanner.settings.v1",
+        premium: "pdfScanner.premium.v1",
+        promoCodes: "pdfScanner.promoCodes.v1"
+      };
+
+      const MAX_PAGES = 25;
+      const FREE_LIMIT = 5;
+      const PROCESSING_VERSION = 4;
+      const STANDARD_PREMIUM_MAX_SIDE = 2400;
+      const STANDARD_FREE_MAX_SIDE = 1650;
+      const SUPER_PREVIEW_MAX_SIDE = 4096;
+      const SUPER_PDF_MAX_SIDE = 8192;
+      const IOS_PDF_MAX_SIDE = 4096;
+      const ORIGINAL_PREMIUM_MAX_SIDE = 4096;
+      const ORIGINAL_FREE_MAX_SIDE = 1900;
+      const FILTERS = ["original", "color", "gray", "bw", "super"];
+      const PREMIUM_FILTERS = new Set(["bw", "super"]);
+      const DEFAULT_ADJUSTMENTS = {
+        brightness: 0,
+        contrast: 12,
+        sharpness: 20,
+        threshold: 0,
+        saturation: 8,
+        temperature: 0,
+        shadows: 35
+      };
+
+      const SLIDER_META = [
+        ["brightness", "Яркость", -60, 70, 1],
+        ["contrast", "Контраст", -60, 90, 1],
+        ["sharpness", "Резкость", 0, 100, 1],
+        ["threshold", "Threshold", -60, 60, 1],
+        ["saturation", "Насыщенность", -80, 80, 1],
+        ["temperature", "Температура", -70, 70, 1],
+        ["shadows", "Удаление теней", 0, 100, 1]
+      ];
+
+      const dom = {
+        body: document.body,
+        video: document.getElementById("video"),
+        cameraState: document.getElementById("cameraState"),
+        cameraStateTitle: document.getElementById("cameraStateTitle"),
+        cameraStateText: document.getElementById("cameraStateText"),
+        retryCameraBtn: document.getElementById("retryCameraBtn"),
+        iosCaptureBtn: document.getElementById("iosCaptureBtn"),
+        captureBtn: document.getElementById("captureBtn"),
+        uploadBtn: document.getElementById("uploadBtn"),
+        stateUploadBtn: document.getElementById("stateUploadBtn"),
+        nextScanBtn: document.getElementById("nextScanBtn"),
+        fileInput: document.getElementById("fileInput"),
+        captureFileInput: document.getElementById("captureFileInput"),
+        liveSvg: document.getElementById("liveSvg"),
+        livePolygon: document.getElementById("livePolygon"),
+        flash: document.getElementById("flash"),
+        dropCatcher: document.getElementById("dropCatcher"),
+        pageCount: document.getElementById("pageCount"),
+        premiumBtn: document.getElementById("premiumBtn"),
+        openPremiumBtn: document.getElementById("openPremiumBtn"),
+        premiumBadge: document.getElementById("premiumBadge"),
+        premiumModal: document.getElementById("premiumModal"),
+        promoModal: document.getElementById("promoModal"),
+        premiumStatusText: document.getElementById("premiumStatusText"),
+        havePromoBtn: document.getElementById("havePromoBtn"),
+        promoInput: document.getElementById("promoInput"),
+        activatePromoBtn: document.getElementById("activatePromoBtn"),
+        copyCardBtn: document.getElementById("copyCardBtn"),
+        copyEmailBtn: document.getElementById("copyEmailBtn"),
+        cardNumber: document.getElementById("cardNumber"),
+        supportEmail: document.getElementById("supportEmail"),
+        themeBtn: document.getElementById("themeBtn"),
+        pagesGrid: document.getElementById("pagesGrid"),
+        editorStage: document.getElementById("editorStage"),
+        editorCanvas: document.getElementById("editorCanvas"),
+        editorEmpty: document.getElementById("editorEmpty"),
+        cornerSvg: document.getElementById("cornerSvg"),
+        cornerShade: document.getElementById("cornerShade"),
+        cornerPolygon: document.getElementById("cornerPolygon"),
+        cornerHandles: document.getElementById("cornerHandles"),
+        cornerModeBtn: document.getElementById("cornerModeBtn"),
+        applyCornersBtn: document.getElementById("applyCornersBtn"),
+        rotateCurrentBtn: document.getElementById("rotateCurrentBtn"),
+        filterSegment: document.getElementById("filterSegment"),
+        sliders: document.getElementById("sliders"),
+        applyAllBtn: document.getElementById("applyAllBtn"),
+        resetSettingsBtn: document.getElementById("resetSettingsBtn"),
+        saveStateBtn: document.getElementById("saveStateBtn"),
+        clearPagesBtn: document.getElementById("clearPagesBtn"),
+        downloadPdfBtn: document.getElementById("downloadPdfBtn"),
+        pdfQualityText: document.getElementById("pdfQualityText"),
+        loader: document.getElementById("loader"),
+        loaderText: document.getElementById("loaderText"),
+        toasts: document.getElementById("toasts")
+      };
+
+      const state = {
+        pages: [],
+        currentId: null,
+        theme: "dark",
+        stream: null,
+        cameraReady: false,
+        cameraFallback: false,
+        processing: false,
+        liveLoop: 0,
+        cropMode: false,
+        editorFit: null,
+        draggingCorner: null,
+        dragPageId: null,
+        settings: {
+          filter: "color",
+          adjustments: { ...DEFAULT_ADJUSTMENTS }
+        },
+        premium: {
+          active: false,
+          code: null,
+          expiresAt: null,
+          activatedAt: null
+        },
+        renderToken: 0
+      };
+
+      function readStore(key, fallback) {
+        try {
+          const raw = localStorage.getItem(key);
+          return raw ? JSON.parse(raw) : fallback;
+        } catch (error) {
+          return fallback;
+        }
+      }
+
+      function writeStore(key, value) {
+        try {
+          localStorage.setItem(key, JSON.stringify(value));
+          return true;
+        } catch (error) {
+          console.warn("Storage write failed", error);
+          return false;
+        }
+      }
+
+      function toast(message, type = "ok") {
+        const node = document.createElement("div");
+        node.className = `toast ${type}`;
+        node.textContent = message;
+        dom.toasts.appendChild(node);
+        window.setTimeout(() => {
+          node.style.opacity = "0";
+          node.style.transform = "translateY(8px)";
+          node.style.transition = "opacity .2s ease, transform .2s ease";
+          window.setTimeout(() => node.remove(), 220);
+        }, 3200);
+      }
+
+      function showLoader(text = "Обработка") {
+        dom.loaderText.textContent = text;
+        dom.loader.classList.add("show");
+      }
+
+      function hideLoader() {
+        dom.loader.classList.remove("show");
+      }
+
+      function debounce(fn, delay) {
+        let id = 0;
+        return (...args) => {
+          window.clearTimeout(id);
+          id = window.setTimeout(() => fn(...args), delay);
+        };
+      }
+
+      function isIOSLike() {
+        return /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+          (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+      }
+
+      function isLocalOrigin() {
+        return ["localhost", "127.0.0.1", "::1"].includes(location.hostname);
+      }
+
+      function needsHttpsForCamera() {
+        return location.protocol !== "file:" && !window.isSecureContext && !isLocalOrigin();
+      }
+
+      function nextFrame() {
+        return new Promise(resolve => requestAnimationFrame(resolve));
+      }
+
+      function uid() {
+        return `p_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+      }
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function distance(a, b) {
+        return Math.hypot(a.x - b.x, a.y - b.y);
+      }
+
+      function polygonArea(points) {
+        let area = 0;
+        for (let i = 0; i < points.length; i++) {
+          const a = points[i];
+          const b = points[(i + 1) % points.length];
+          area += a.x * b.y - b.x * a.y;
+        }
+        return Math.abs(area / 2);
+      }
+
+      function defaultCorners(width, height, padRatio = .045) {
+        const px = width * padRatio;
+        const py = height * padRatio;
+        return [
+          { x: px, y: py },
+          { x: width - px, y: py },
+          { x: width - px, y: height - py },
+          { x: px, y: height - py }
+        ];
+      }
+
+      function orderCorners(points) {
+        if (!points || points.length !== 4) return points;
+        const unique = [];
+        for (const point of points) {
+          if (!unique.some(p => Math.hypot(p.x - point.x, p.y - point.y) < 2)) unique.push({ x: point.x, y: point.y });
+        }
+        if (unique.length !== 4) {
+          const sorted = [...points].sort((a, b) => (a.y - b.y) || (a.x - b.x));
+          const top = sorted.slice(0, 2).sort((a, b) => a.x - b.x);
+          const bottom = sorted.slice(2).sort((a, b) => a.x - b.x);
+          return [top[0], top[1], bottom[1], bottom[0]].map(p => ({ x: p.x, y: p.y }));
+        }
+        let tl = unique[0], tr = unique[0], br = unique[0], bl = unique[0];
+        for (const p of unique) {
+          if (p.x + p.y < tl.x + tl.y) tl = p;
+          if (p.x + p.y > br.x + br.y) br = p;
+          if (p.x - p.y > tr.x - tr.y) tr = p;
+          if (p.x - p.y < bl.x - bl.y) bl = p;
+        }
+        const candidate = [tl, tr, br, bl].map(p => ({ x: p.x, y: p.y }));
+        if (new Set(candidate.map(p => `${Math.round(p.x)}:${Math.round(p.y)}`)).size < 4) {
+          const cx = unique.reduce((s, p) => s + p.x, 0) / 4;
+          const cy = unique.reduce((s, p) => s + p.y, 0) / 4;
+          const around = unique.map(p => ({ ...p, a: Math.atan2(p.y - cy, p.x - cx) })).sort((a, b) => a.a - b.a);
+          const start = around.reduce((best, p, i) => (p.x + p.y < around[best].x + around[best].y ? i : best), 0);
+          return [...around.slice(start), ...around.slice(0, start)].map(({ x, y }) => ({ x, y }));
+        }
+        return candidate;
+      }
+
+      function createCanvas(width, height) {
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.round(width));
+        canvas.height = Math.max(1, Math.round(height));
+        return canvas;
+      }
+
+      function canvasFromImage(image) {
+        const canvas = createCanvas(image.naturalWidth || image.width, image.naturalHeight || image.height);
+        canvas.getContext("2d", { willReadFrequently: true }).drawImage(image, 0, 0, canvas.width, canvas.height);
+        return canvas;
+      }
+
+      function canvasToJpeg(canvas, quality = .9) {
+        return canvas.toDataURL("image/jpeg", quality);
+      }
+
+      function loadImage(src) {
+        return new Promise((resolve, reject) => {
+          const image = new Image();
+          image.onload = () => resolve(image);
+          image.onerror = () => reject(new Error("Не удалось прочитать изображение"));
+          image.src = src;
+        });
+      }
+
+      async function fileToCanvas(file) {
+        if (!/^image\//i.test(file.type)) {
+          throw new Error(`Файл ${file.name || ""} не является поддерживаемым изображением`);
+        }
+        if ("createImageBitmap" in window) {
+          try {
+            const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
+            const canvas = createCanvas(bitmap.width, bitmap.height);
+            canvas.getContext("2d", { willReadFrequently: true }).drawImage(bitmap, 0, 0);
+            bitmap.close?.();
+            return canvas;
+          } catch (error) {
+            console.warn("createImageBitmap fallback", error);
+          }
+        }
+        const dataUrl = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = () => reject(new Error("Не удалось прочитать файл"));
+          reader.readAsDataURL(file);
+        });
+        return canvasFromImage(await loadImage(dataUrl));
+      }
+
+      function resizeCanvas(source, maxSide = 2000) {
+        const side = Math.max(source.width, source.height);
+        if (side <= maxSide) return source;
+        const scale = maxSide / side;
+        const target = createCanvas(source.width * scale, source.height * scale);
+        const ctx = target.getContext("2d", { willReadFrequently: true });
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = "high";
+        ctx.drawImage(source, 0, 0, target.width, target.height);
+        return target;
+      }
+
+      function upscaleCanvas(source, targetMaxSide) {
+        const side = Math.max(source.width, source.height);
+        if (side >= targetMaxSide) return source;
+        let current = source;
+        let currentSide = side;
+        while (currentSide < targetMaxSide * .995) {
+          const scale = Math.min(2, targetMaxSide / currentSide);
+          const next = createCanvas(current.width * scale, current.height * scale);
+          const ctx = next.getContext("2d", { willReadFrequently: true });
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = "high";
+          ctx.drawImage(current, 0, 0, next.width, next.height);
+          current = next;
+          currentSide = Math.max(current.width, current.height);
+        }
+        return enhanceUpscaledCanvas(current);
+      }
+
+      function enhanceUpscaledCanvas(canvas) {
+        const pixels = canvas.width * canvas.height;
+        if (pixels > 32000000) return canvas;
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        sharpenImageData(imageData, canvas.width, canvas.height, 18);
+        ctx.putImageData(imageData, 0, 0);
+        return canvas;
+      }
+
+      function renderMaxSideForMode(mode, context) {
+        if (mode === "super") {
+          if (context === "pdf" && isPremium()) return isIOSLike() ? IOS_PDF_MAX_SIDE : SUPER_PDF_MAX_SIDE;
+          return SUPER_PREVIEW_MAX_SIDE;
+        }
+        return isPremium() ? STANDARD_PREMIUM_MAX_SIDE : STANDARD_FREE_MAX_SIDE;
+      }
+
+      function makeThumb(source, maxWidth = 280) {
+        const scale = Math.min(1, maxWidth / source.width);
+        const canvas = createCanvas(source.width * scale, source.height * scale);
+        const ctx = canvas.getContext("2d");
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = "high";
+        ctx.drawImage(source, 0, 0, canvas.width, canvas.height);
+        return canvasToJpeg(canvas, .74);
+      }
+
+      function solveLinearSystem(matrix, vector) {
+        const n = vector.length;
+        const a = matrix.map((row, i) => [...row, vector[i]]);
+        for (let col = 0; col < n; col++) {
+          let pivot = col;
+          for (let row = col + 1; row < n; row++) {
+            if (Math.abs(a[row][col]) > Math.abs(a[pivot][col])) pivot = row;
+          }
+          if (Math.abs(a[pivot][col]) < 1e-12) return null;
+          [a[col], a[pivot]] = [a[pivot], a[col]];
+          const div = a[col][col];
+          for (let j = col; j <= n; j++) a[col][j] /= div;
+          for (let row = 0; row < n; row++) {
+            if (row === col) continue;
+            const factor = a[row][col];
+            for (let j = col; j <= n; j++) a[row][j] -= factor * a[col][j];
+          }
+        }
+        return a.map(row => row[n]);
+      }
+
+      function homographyFromRectToQuad(width, height, quad) {
+        const src = [
+          { x: 0, y: 0, u: quad[0].x, v: quad[0].y },
+          { x: width - 1, y: 0, u: quad[1].x, v: quad[1].y },
+          { x: width - 1, y: height - 1, u: quad[2].x, v: quad[2].y },
+          { x: 0, y: height - 1, u: quad[3].x, v: quad[3].y }
+        ];
+        const m = [];
+        const b = [];
+        for (const p of src) {
+          m.push([p.x, p.y, 1, 0, 0, 0, -p.u * p.x, -p.u * p.y]);
+          b.push(p.u);
+          m.push([0, 0, 0, p.x, p.y, 1, -p.v * p.x, -p.v * p.y]);
+          b.push(p.v);
+        }
+        return solveLinearSystem(m, b);
+      }
+
+      function warpPerspective(source, corners, maxSide) {
+        const quad = orderCorners(corners);
+        const top = distance(quad[0], quad[1]);
+        const bottom = distance(quad[3], quad[2]);
+        const left = distance(quad[0], quad[3]);
+        const right = distance(quad[1], quad[2]);
+        let width = Math.max(80, Math.round((top + bottom) / 2));
+        let height = Math.max(80, Math.round((left + right) / 2));
+        const scale = Math.min(1, maxSide / Math.max(width, height));
+        width = Math.round(width * scale);
+        height = Math.round(height * scale);
+        const h = homographyFromRectToQuad(width, height, quad);
+        if (!h) {
+          const fallback = createCanvas(width, height);
+          fallback.getContext("2d").drawImage(source, 0, 0, width, height);
+          return fallback;
+        }
+        const srcCtx = source.getContext("2d", { willReadFrequently: true });
+        const src = srcCtx.getImageData(0, 0, source.width, source.height);
+        const out = createCanvas(width, height);
+        const dstCtx = out.getContext("2d", { willReadFrequently: true });
+        const dst = dstCtx.createImageData(width, height);
+        const sd = src.data;
+        const dd = dst.data;
+        const sw = source.width;
+        const sh = source.height;
+
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) {
+            const denom = h[6] * x + h[7] * y + 1;
+            const sx = (h[0] * x + h[1] * y + h[2]) / denom;
+            const sy = (h[3] * x + h[4] * y + h[5]) / denom;
+            const di = (y * width + x) * 4;
+            if (sx < 0 || sy < 0 || sx >= sw - 1 || sy >= sh - 1) {
+              dd[di] = dd[di + 1] = dd[di + 2] = 255;
+              dd[di + 3] = 255;
+              continue;
+            }
+            const x0 = Math.floor(sx);
+            const y0 = Math.floor(sy);
+            const fx = sx - x0;
+            const fy = sy - y0;
+            const i00 = (y0 * sw + x0) * 4;
+            const i10 = i00 + 4;
+            const i01 = i00 + sw * 4;
+            const i11 = i01 + 4;
+            for (let c = 0; c < 3; c++) {
+              const v0 = sd[i00 + c] * (1 - fx) + sd[i10 + c] * fx;
+              const v1 = sd[i01 + c] * (1 - fx) + sd[i11 + c] * fx;
+              dd[di + c] = v0 * (1 - fy) + v1 * fy;
+            }
+            dd[di + 3] = 255;
+          }
+        }
+        dstCtx.putImageData(dst, 0, 0);
+        return out;
+      }
+
+      function rotateCanvas(source, degrees) {
+        const normalized = ((degrees % 360) + 360) % 360;
+        if (!normalized) return source;
+        const swap = normalized === 90 || normalized === 270;
+        const out = createCanvas(swap ? source.height : source.width, swap ? source.width : source.height);
+        const ctx = out.getContext("2d");
+        ctx.translate(out.width / 2, out.height / 2);
+        ctx.rotate(normalized * Math.PI / 180);
+        ctx.drawImage(source, -source.width / 2, -source.height / 2);
+        return out;
+      }
+
+      function boxBlurGray(gray, width, height, radius) {
+        if (radius <= 0) return gray.slice();
+        const tmp = new Float32Array(width * height);
+        const out = new Float32Array(width * height);
+        const size = radius * 2 + 1;
+        for (let y = 0; y < height; y++) {
+          let sum = 0;
+          for (let x = -radius; x <= radius; x++) sum += gray[y * width + clamp(x, 0, width - 1)];
+          for (let x = 0; x < width; x++) {
+            tmp[y * width + x] = sum / size;
+            const remove = clamp(x - radius, 0, width - 1);
+            const add = clamp(x + radius + 1, 0, width - 1);
+            sum += gray[y * width + add] - gray[y * width + remove];
+          }
+        }
+        for (let x = 0; x < width; x++) {
+          let sum = 0;
+          for (let y = -radius; y <= radius; y++) sum += tmp[clamp(y, 0, height - 1) * width + x];
+          for (let y = 0; y < height; y++) {
+            out[y * width + x] = sum / size;
+            const remove = clamp(y - radius, 0, height - 1);
+            const add = clamp(y + radius + 1, 0, height - 1);
+            sum += tmp[add * width + x] - tmp[remove * width + x];
+          }
+        }
+        return out;
+      }
+
+      function sharpenImageData(imageData, width, height, amount) {
+        if (amount <= 0) return imageData;
+        const src = imageData.data;
+        const copy = new Uint8ClampedArray(src);
+        const strength = amount / 100;
+        for (let y = 1; y < height - 1; y++) {
+          for (let x = 1; x < width - 1; x++) {
+            const i = (y * width + x) * 4;
+            for (let c = 0; c < 3; c++) {
+              const center = copy[i + c] * 5;
+              const around = copy[i - 4 + c] + copy[i + 4 + c] + copy[i - width * 4 + c] + copy[i + width * 4 + c];
+              src[i + c] = clamp(copy[i + c] * (1 - strength) + (center - around) * strength, 0, 255);
+            }
+          }
+        }
+        return imageData;
+      }
+
+      function histogramPercentiles(luma) {
+        const hist = new Uint32Array(256);
+        for (let i = 0; i < luma.length; i++) hist[clamp(Math.round(luma[i]), 0, 255)]++;
+        const total = luma.length;
+        const lowTarget = total * .01;
+        const highTarget = total * .99;
+        let low = 0, high = 255, sum = 0;
+        for (let i = 0; i < 256; i++) {
+          sum += hist[i];
+          if (sum >= lowTarget) { low = i; break; }
+        }
+        sum = 0;
+        for (let i = 0; i < 256; i++) {
+          sum += hist[i];
+          if (sum >= highTarget) { high = i; break; }
+        }
+        if (high - low < 40) { low = 0; high = 255; }
+        return { low, high };
+      }
+
+      function channelPercentiles(imageData, lowPct = .006, highPct = .995) {
+        const d = imageData.data;
+        const hist = [new Uint32Array(256), new Uint32Array(256), new Uint32Array(256)];
+        const total = d.length / 4;
+        for (let i = 0; i < d.length; i += 4) {
+          hist[0][d[i]]++;
+          hist[1][d[i + 1]]++;
+          hist[2][d[i + 2]]++;
+        }
+        const get = (channel, pct) => {
+          const target = total * pct;
+          let sum = 0;
+          for (let i = 0; i < 256; i++) {
+            sum += hist[channel][i];
+            if (sum >= target) return i;
+          }
+          return 255;
+        };
+        const levels = ["r", "g", "b"].map((name, channel) => {
+          const low = get(channel, lowPct);
+          const high = get(channel, highPct);
+          return [name, high - low < 32 ? { low: 0, high: 255 } : { low, high }];
+        });
+        return Object.fromEntries(levels);
+      }
+
+      function estimateWhiteBalance(imageData, gray) {
+        const d = imageData.data;
+        const levels = histogramPercentiles(gray);
+        const threshold = Math.max(145, levels.high - 42);
+        let r = 0, g = 0, b = 0, count = 0;
+        for (let i = 0, p = 0; i < d.length; i += 4, p++) {
+          const l = gray[p];
+          const max = Math.max(d[i], d[i + 1], d[i + 2]);
+          const min = Math.min(d[i], d[i + 1], d[i + 2]);
+          if (l >= threshold && max < 252 && max - min < 72) {
+            r += d[i];
+            g += d[i + 1];
+            b += d[i + 2];
+            count++;
+          }
+        }
+        if (count < gray.length * .012) return { r: 1, g: 1, b: 1 };
+        r /= count;
+        g /= count;
+        b /= count;
+        const target = (r + g + b) / 3 || 1;
+        return {
+          r: clamp(target / Math.max(1, r), .88, 1.14),
+          g: clamp(target / Math.max(1, g), .88, 1.14),
+          b: clamp(target / Math.max(1, b), .88, 1.14)
+        };
+      }
+
+      function otsu(gray) {
+        const hist = new Uint32Array(256);
+        for (let i = 0; i < gray.length; i++) hist[clamp(Math.round(gray[i]), 0, 255)]++;
+        const total = gray.length;
+        let sum = 0;
+        for (let i = 0; i < 256; i++) sum += i * hist[i];
+        let sumB = 0, wB = 0, maxVar = 0, threshold = 128;
+        for (let i = 0; i < 256; i++) {
+          wB += hist[i];
+          if (!wB) continue;
+          const wF = total - wB;
+          if (!wF) break;
+          sumB += i * hist[i];
+          const mB = sumB / wB;
+          const mF = (sum - sumB) / wF;
+          const between = wB * wF * Math.pow(mB - mF, 2);
+          if (between > maxVar) {
+            maxVar = between;
+            threshold = i;
+          }
+        }
+        return threshold;
+      }
+
+      function imageToneMetrics(gray) {
+        let dark = 0;
+        let bright = 0;
+        let sum = 0;
+        for (let i = 0; i < gray.length; i++) {
+          const value = gray[i];
+          if (value < 58) dark++;
+          if (value > 198) bright++;
+          sum += value;
+        }
+        return {
+          darkRatio: dark / gray.length,
+          brightRatio: bright / gray.length,
+          mean: sum / gray.length
+        };
+      }
+
+      function processImage(canvas, mode, adjustments) {
+        const out = createCanvas(canvas.width, canvas.height);
+        const ctx = out.getContext("2d", { willReadFrequently: true });
+        ctx.drawImage(canvas, 0, 0);
+        const imageData = ctx.getImageData(0, 0, out.width, out.height);
+        const d = imageData.data;
+        const count = out.width * out.height;
+        const gray = new Float32Array(count);
+        for (let i = 0, p = 0; i < d.length; i += 4, p++) {
+          gray[p] = d[i] * .299 + d[i + 1] * .587 + d[i + 2] * .114;
+        }
+
+        if (mode === "super") {
+          applySuperScan(imageData, out.width, out.height, adjustments, gray);
+          ctx.putImageData(imageData, 0, 0);
+          return out;
+        }
+
+        if (mode === "bw") {
+          applyBlackWhite(imageData, out.width, out.height, adjustments, gray);
+          ctx.putImageData(imageData, 0, 0);
+          return out;
+        }
+
+        if (mode === "gray") {
+          for (let i = 0, p = 0; i < d.length; i += 4, p++) {
+            d[i] = d[i + 1] = d[i + 2] = gray[p];
+          }
+        }
+
+        if (mode === "color") {
+          const levels = histogramPercentiles(gray);
+          const range = levels.high - levels.low || 255;
+          for (let i = 0; i < d.length; i += 4) {
+            d[i] = clamp((d[i] - levels.low) * 255 / range, 0, 255);
+            d[i + 1] = clamp((d[i + 1] - levels.low) * 255 / range, 0, 255);
+            d[i + 2] = clamp((d[i + 2] - levels.low) * 255 / range, 0, 255);
+          }
+        }
+
+        applyManualAdjustments(imageData, adjustments, mode);
+        sharpenImageData(imageData, out.width, out.height, adjustments.sharpness);
+        ctx.putImageData(imageData, 0, 0);
+        return out;
+      }
+
+      function applyManualAdjustments(imageData, adjustments, mode) {
+        const d = imageData.data;
+        const brightness = adjustments.brightness;
+        const contrast = clamp(adjustments.contrast, -240, 240);
+        const contrastFactor = (259 * (contrast + 255)) / (255 * (259 - contrast));
+        const sat = 1 + adjustments.saturation / 100;
+        const temp = adjustments.temperature;
+        const shadowLift = adjustments.shadows / 100;
+
+        for (let i = 0; i < d.length; i += 4) {
+          let r = d[i];
+          let g = d[i + 1];
+          let b = d[i + 2];
+          const l = r * .299 + g * .587 + b * .114;
+          const shadow = Math.max(0, 180 - l) / 180 * 34 * shadowLift;
+          r = contrastFactor * (r - 128) + 128 + brightness + shadow + temp * .34;
+          g = contrastFactor * (g - 128) + 128 + brightness + shadow;
+          b = contrastFactor * (b - 128) + 128 + brightness + shadow - temp * .34;
+          const nl = r * .299 + g * .587 + b * .114;
+          if (mode !== "gray") {
+            r = nl + (r - nl) * sat;
+            g = nl + (g - nl) * sat;
+            b = nl + (b - nl) * sat;
+          }
+          d[i] = clamp(r, 0, 255);
+          d[i + 1] = clamp(g, 0, 255);
+          d[i + 2] = clamp(b, 0, 255);
+        }
+      }
+
+      function applyBlackWhite(imageData, width, height, adjustments, gray) {
+        const d = imageData.data;
+        const background = boxBlurGray(gray, width, height, Math.max(6, Math.round(Math.min(width, height) / 48)));
+        const normalized = new Float32Array(gray.length);
+        const shadowStrength = adjustments.shadows / 100;
+        for (let i = 0; i < gray.length; i++) {
+          const lifted = gray[i] + Math.max(0, 235 - background[i]) * shadowStrength;
+          normalized[i] = clamp(lifted, 0, 255);
+        }
+        const threshold = otsu(normalized) + adjustments.threshold;
+        for (let i = 0, p = 0; i < d.length; i += 4, p++) {
+          const v = normalized[p] > threshold ? 255 : 0;
+          d[i] = d[i + 1] = d[i + 2] = v;
+          d[i + 3] = 255;
+        }
+        sharpenImageData(imageData, width, height, adjustments.sharpness * .35);
+      }
+
+      function applySuperScan(imageData, width, height, adjustments, gray) {
+        const d = imageData.data;
+        const tone = imageToneMetrics(gray);
+        if (tone.darkRatio > .38 && tone.brightRatio > .08 && tone.mean < 132) {
+          applyDarkArtworkColorScan(imageData, width, height, adjustments, gray);
+          return;
+        }
+        const bigRadius = clamp(Math.round(Math.min(width, height) / 28), 10, 38);
+        const smallRadius = clamp(Math.round(Math.min(width, height) / 120), 2, 8);
+        const background = boxBlurGray(gray, width, height, bigRadius);
+        const local = boxBlurGray(gray, width, height, smallRadius);
+        const lumaLevels = histogramPercentiles(gray);
+        const channelLevels = channelPercentiles(imageData);
+        const whiteBalance = estimateWhiteBalance(imageData, gray);
+        const lumaRange = Math.max(48, lumaLevels.high - lumaLevels.low);
+        const autoContrast = 1.06 + clamp((185 - lumaRange) / 260, 0, .24) + adjustments.contrast / 260;
+        const shadowStrength = adjustments.shadows / 100;
+        const microContrast = .24 + adjustments.sharpness / 260;
+        const saturation = 1.07 + adjustments.saturation / 170;
+        const thresholdBias = adjustments.threshold * .18;
+        const temperature = adjustments.temperature;
+
+        for (let i = 0, p = 0; i < d.length; i += 4, p++) {
+          const bg = background[p];
+          const l = gray[p];
+          const paperMask = clamp((bg - 72) / 135, 0, 1);
+          const shadowLift = Math.max(0, 236 - bg) * shadowStrength * paperMask * .52;
+          const detail = (l - local[p]) * microContrast;
+
+          let r = d[i] * whiteBalance.r + shadowLift;
+          let g = d[i + 1] * whiteBalance.g + shadowLift;
+          let b = d[i + 2] * whiteBalance.b + shadowLift;
+
+          r = (r - channelLevels.r.low) * 255 / Math.max(1, channelLevels.r.high - channelLevels.r.low);
+          g = (g - channelLevels.g.low) * 255 / Math.max(1, channelLevels.g.high - channelLevels.g.low);
+          b = (b - channelLevels.b.low) * 255 / Math.max(1, channelLevels.b.high - channelLevels.b.low);
+
+          r = 128 + (r - 128) * autoContrast + detail + adjustments.brightness + thresholdBias + temperature * .22;
+          g = 128 + (g - 128) * autoContrast + detail + adjustments.brightness + thresholdBias;
+          b = 128 + (b - 128) * autoContrast + detail + adjustments.brightness + thresholdBias - temperature * .22;
+
+          let nl = r * .299 + g * .587 + b * .114;
+          r = nl + (r - nl) * saturation;
+          g = nl + (g - nl) * saturation;
+          b = nl + (b - nl) * saturation;
+
+          nl = r * .299 + g * .587 + b * .114;
+          const chroma = Math.max(r, g, b) - Math.min(r, g, b);
+          const whiteCleanup = clamp((nl - 224) / 28, 0, 1) * clamp((32 - chroma) / 32, 0, 1) * paperMask;
+          r = r * (1 - whiteCleanup) + 255 * whiteCleanup;
+          g = g * (1 - whiteCleanup) + 255 * whiteCleanup;
+          b = b * (1 - whiteCleanup) + 255 * whiteCleanup;
+
+          d[i] = clamp(r, 0, 255);
+          d[i + 1] = clamp(g, 0, 255);
+          d[i + 2] = clamp(b, 0, 255);
+          d[i + 3] = 255;
+        }
+        sharpenImageData(imageData, width, height, clamp(adjustments.sharpness * .55 + 10, 0, 55));
+      }
+
+      function applyDarkArtworkColorScan(imageData, width, height, adjustments, gray) {
+        const d = imageData.data;
+        const levels = channelPercentiles(imageData, .004, .996);
+        const local = boxBlurGray(gray, width, height, clamp(Math.round(Math.min(width, height) / 90), 3, 12));
+        const contrast = 1.18 + adjustments.contrast / 220;
+        const saturation = 1.04 + adjustments.saturation / 190;
+        const detailStrength = .36 + adjustments.sharpness / 240;
+        const temperature = adjustments.temperature;
+
+        for (let i = 0, p = 0; i < d.length; i += 4, p++) {
+          const detail = (gray[p] - local[p]) * detailStrength;
+          let r = (d[i] - levels.r.low) * 255 / Math.max(1, levels.r.high - levels.r.low);
+          let g = (d[i + 1] - levels.g.low) * 255 / Math.max(1, levels.g.high - levels.g.low);
+          let b = (d[i + 2] - levels.b.low) * 255 / Math.max(1, levels.b.high - levels.b.low);
+
+          r = 128 + (r - 128) * contrast + detail + adjustments.brightness + temperature * .18;
+          g = 128 + (g - 128) * contrast + detail + adjustments.brightness;
+          b = 128 + (b - 128) * contrast + detail + adjustments.brightness - temperature * .18;
+
+          const nl = r * .299 + g * .587 + b * .114;
+          r = nl + (r - nl) * saturation;
+          g = nl + (g - nl) * saturation;
+          b = nl + (b - nl) * saturation;
+
+          const chroma = Math.max(r, g, b) - Math.min(r, g, b);
+          if (nl < 14 && chroma < 28) {
+            r = g = b = 0;
+          } else if (nl > 244 && chroma < 28) {
+            r = g = b = 255;
+          }
+
+          d[i] = clamp(r, 0, 255);
+          d[i + 1] = clamp(g, 0, 255);
+          d[i + 2] = clamp(b, 0, 255);
+          d[i + 3] = 255;
+        }
+        sharpenImageData(imageData, width, height, clamp(adjustments.sharpness * .45 + 8, 0, 48));
+      }
+
+      function detectDocument(sourceCanvas) {
+        const maxW = 520;
+        const scale = Math.min(1, maxW / sourceCanvas.width);
+        const width = Math.max(80, Math.round(sourceCanvas.width * scale));
+        const height = Math.max(80, Math.round(sourceCanvas.height * scale));
+        const canvas = createCanvas(width, height);
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = "high";
+        ctx.drawImage(sourceCanvas, 0, 0, width, height);
+        const data = ctx.getImageData(0, 0, width, height).data;
+        const gray = new Float32Array(width * height);
+        for (let i = 0, p = 0; i < data.length; i += 4, p++) {
+          gray[p] = data[i] * .299 + data[i + 1] * .587 + data[i + 2] * .114;
+        }
+        const blurred = boxBlurGray(gray, width, height, 1);
+        const mag = new Float32Array(width * height);
+        let sum = 0;
+        let sumSq = 0;
+        for (let y = 1; y < height - 1; y++) {
+          for (let x = 1; x < width - 1; x++) {
+            const i = y * width + x;
+            const gx =
+              -blurred[i - width - 1] - 2 * blurred[i - 1] - blurred[i + width - 1] +
+              blurred[i - width + 1] + 2 * blurred[i + 1] + blurred[i + width + 1];
+            const gy =
+              -blurred[i - width - 1] - 2 * blurred[i - width] - blurred[i - width + 1] +
+              blurred[i + width - 1] + 2 * blurred[i + width] + blurred[i + width + 1];
+            const m = Math.min(255, Math.hypot(gx, gy));
+            mag[i] = m;
+            sum += m;
+            sumSq += m * m;
+          }
+        }
+        const pixels = Math.max(1, (width - 2) * (height - 2));
+        const mean = sum / pixels;
+        const std = Math.sqrt(Math.max(0, sumSq / pixels - mean * mean));
+        const threshold = clamp(mean + std * .88, 32, 118);
+        let mask = new Uint8Array(width * height);
+        for (let i = 0; i < mag.length; i++) mask[i] = mag[i] >= threshold ? 1 : 0;
+        mask = dilate(mask, width, height, 2);
+        const component = largestComponent(mask, width, height);
+        if (!component || component.count < width * height * .006) return null;
+        const boxW = component.maxX - component.minX;
+        const boxH = component.maxY - component.minY;
+        if (boxW < width * .24 || boxH < height * .24) return null;
+        const quad = orderCorners([
+          component.tl,
+          component.tr,
+          component.br,
+          component.bl
+        ]);
+        const area = polygonArea(quad);
+        if (area < width * height * .08) return null;
+        const marginHits =
+          (component.minX < 3 ? 1 : 0) + (component.minY < 3 ? 1 : 0) +
+          (component.maxX > width - 4 ? 1 : 0) + (component.maxY > height - 4 ? 1 : 0);
+        if (marginHits >= 3 && area > width * height * .9) return null;
+        return quad.map(p => ({ x: p.x / scale, y: p.y / scale }));
+      }
+
+      function dilate(mask, width, height, iterations) {
+        let current = mask;
+        for (let iter = 0; iter < iterations; iter++) {
+          const next = new Uint8Array(width * height);
+          for (let y = 1; y < height - 1; y++) {
+            for (let x = 1; x < width - 1; x++) {
+              const i = y * width + x;
+              if (
+                current[i] || current[i - 1] || current[i + 1] ||
+                current[i - width] || current[i + width] ||
+                current[i - width - 1] || current[i - width + 1] ||
+                current[i + width - 1] || current[i + width + 1]
+              ) next[i] = 1;
+            }
+          }
+          current = next;
+        }
+        return current;
+      }
+
+      function largestComponent(mask, width, height) {
+        const visited = new Uint8Array(mask.length);
+        const queue = new Int32Array(mask.length);
+        let best = null;
+        for (let start = 0; start < mask.length; start++) {
+          if (!mask[start] || visited[start]) continue;
+          let head = 0, tail = 0;
+          queue[tail++] = start;
+          visited[start] = 1;
+          let count = 0;
+          let minX = width, minY = height, maxX = 0, maxY = 0;
+          let tl = { x: width, y: height };
+          let tr = { x: 0, y: height };
+          let br = { x: 0, y: 0 };
+          let bl = { x: width, y: 0 };
+          while (head < tail) {
+            const idx = queue[head++];
+            const x = idx % width;
+            const y = (idx / width) | 0;
+            count++;
+            if (x < minX) minX = x;
+            if (x > maxX) maxX = x;
+            if (y < minY) minY = y;
+            if (y > maxY) maxY = y;
+            if (x + y < tl.x + tl.y) tl = { x, y };
+            if (x - y > tr.x - tr.y) tr = { x, y };
+            if (x + y > br.x + br.y) br = { x, y };
+            if (x - y < bl.x - bl.y) bl = { x, y };
+            const neighbors = [idx - 1, idx + 1, idx - width, idx + width];
+            for (const ni of neighbors) {
+              if (ni < 0 || ni >= mask.length || visited[ni] || !mask[ni]) continue;
+              const nx = ni % width;
+              if (Math.abs(nx - x) > 1) continue;
+              visited[ni] = 1;
+              queue[tail++] = ni;
+            }
+          }
+          if (!best || count > best.count) best = { count, minX, minY, maxX, maxY, tl, tr, br, bl };
+        }
+        return best;
+      }
+
+      async function renderPageCanvas(page, context = "preview") {
+        const image = await loadImage(page.originalDataUrl);
+        const source = canvasFromImage(image);
+        const mode = ensureFilterAllowed(page.filter || state.settings.filter);
+        const targetMaxSide = renderMaxSideForMode(mode, context);
+        const warpMaxSide = Math.min(targetMaxSide, Math.max(source.width, source.height));
+        const cropped = warpPerspective(source, page.corners || defaultCorners(source.width, source.height), warpMaxSide);
+        const processed = processImage(cropped, mode, page.adjustments || state.settings.adjustments);
+        const enhanced = mode === "super" ? upscaleCanvas(processed, targetMaxSide) : processed;
+        return rotateCanvas(enhanced, page.rotation || 0);
+      }
+
+      async function processPage(page, options = {}) {
+        const mode = ensureFilterAllowed(page.filter || state.settings.filter);
+        const rotated = await renderPageCanvas(page, "preview");
+        page.processedDataUrl = canvasToJpeg(rotated, isPremium() ? .94 : .84);
+        page.thumbDataUrl = makeThumb(rotated, 260);
+        page.width = rotated.width;
+        page.height = rotated.height;
+        page.renderMaxSide = Math.max(rotated.width, rotated.height);
+        page.processingVersion = PROCESSING_VERSION;
+        page.filter = mode;
+        page.adjustments = { ...(page.adjustments || state.settings.adjustments) };
+        if (!options.skipPersist) persistPages();
+        return page;
+      }
+
+      function ensureFilterAllowed(filter) {
+        if (!FILTERS.includes(filter)) return "color";
+        if (!isPremium() && PREMIUM_FILTERS.has(filter)) return "color";
+        return filter;
+      }
+
+      function isPremium() {
+        if (!state.premium?.active) return false;
+        if (state.premium.expiresAt && Date.now() > state.premium.expiresAt) {
+          state.premium.active = false;
+          writeStore(STORE.premium, state.premium);
+          return false;
+        }
+        return true;
+      }
+
+      function currentLimit() {
+        return isPremium() ? MAX_PAGES : FREE_LIMIT;
+      }
+
+      function canAddPage(showMessage = true) {
+        if (state.pages.length >= MAX_PAGES) {
+          if (showMessage) toast("Достигнут максимум: 25 страниц.", "warn");
+          return false;
+        }
+        if (state.pages.length >= FREE_LIMIT && !isPremium()) {
+          if (showMessage) {
+            toast("В Free режиме доступно 5 страниц. Для 25 страниц нужен Premium.", "warn");
+            openModal("premiumModal");
+          }
+          return false;
+        }
+        return true;
+      }
+
+      async function addPageFromCanvas(sourceCanvas, sourceLabel = "Скан") {
+        if (!canAddPage()) return;
+        showLoader("Поиск документа");
+        await nextFrame();
+        const normalized = resizeCanvas(sourceCanvas, isPremium() ? ORIGINAL_PREMIUM_MAX_SIDE : ORIGINAL_FREE_MAX_SIDE);
+        const corners = detectDocument(normalized);
+        const page = {
+          id: uid(),
+          title: sourceLabel,
+          createdAt: Date.now(),
+          originalDataUrl: canvasToJpeg(normalized, .86),
+          originalWidth: normalized.width,
+          originalHeight: normalized.height,
+          corners: corners || defaultCorners(normalized.width, normalized.height, .035),
+          filter: ensureFilterAllowed(state.settings.filter),
+          adjustments: { ...state.settings.adjustments },
+          rotation: 0,
+          detection: corners ? "auto" : "manual"
+        };
+        showLoader(corners ? "Выравнивание перспективы" : "Ручной режим");
+        await processPage(page, { skipPersist: true });
+        state.pages.push(page);
+        state.currentId = page.id;
+        if (!corners) {
+          state.cropMode = true;
+          toast("Контур не найден. Проверьте углы вручную.", "warn");
+        } else {
+          state.cropMode = false;
+          toast("Страница добавлена.", "ok");
+        }
+        persistPages();
+        renderAll();
+        hideLoader();
+      }
+
+      async function captureFrame() {
+        if (state.processing) return;
+        if (!state.cameraReady || !dom.video.videoWidth) {
+          if (state.cameraFallback) {
+            toast("Открываю системную камеру/галерею как fallback.", "warn");
+            dom.captureFileInput.click();
+            return;
+          }
+          toast("Камера ещё не готова. Можно загрузить изображение из галереи.", "warn");
+          return;
+        }
+        if (!canAddPage()) return;
+        state.processing = true;
+        dom.captureBtn.disabled = true;
+        dom.flash.classList.remove("show");
+        void dom.flash.offsetWidth;
+        dom.flash.classList.add("show");
+        try {
+          const canvas = createCanvas(dom.video.videoWidth, dom.video.videoHeight);
+          canvas.getContext("2d", { willReadFrequently: true }).drawImage(dom.video, 0, 0);
+          await addPageFromCanvas(canvas, "Камера");
+        } catch (error) {
+          console.error(error);
+          toast(error.message || "Не удалось сделать снимок", "danger");
+        } finally {
+          state.processing = false;
+          dom.captureBtn.disabled = false;
+          hideLoader();
+        }
+      }
+
+      async function handleFiles(files) {
+        const list = [...files];
+        if (!list.length) return;
+        let added = 0;
+        for (const file of list) {
+          if (!canAddPage()) break;
+          state.processing = true;
+          try {
+            showLoader(`Загрузка: ${file.name || "изображение"}`);
+            const canvas = await fileToCanvas(file);
+            await addPageFromCanvas(canvas, file.name || "Изображение");
+            added++;
+          } catch (error) {
+            console.error(error);
+            toast(error.message || "Не удалось загрузить файл", "danger");
+          } finally {
+            state.processing = false;
+            hideLoader();
+          }
+        }
+        if (added > 1) toast(`Добавлено страниц: ${added}`, "ok");
+      }
+
+      async function startCamera() {
+        stopCamera();
+        state.cameraReady = false;
+        state.cameraFallback = false;
+        dom.captureBtn.disabled = true;
+        dom.cameraState.classList.remove("hidden");
+        dom.cameraStateTitle.textContent = "Запуск камеры";
+        dom.cameraStateText.textContent = "Разрешите доступ к камере. Если камера недоступна, можно загрузить изображения через галерею или перетащить файлы.";
+        try {
+          if (needsHttpsForCamera()) {
+            throw new Error("Для камеры на iPhone и других мобильных браузерах нужен HTTPS. По http://192.168.x.x камера блокируется браузером.");
+          }
+          if (!navigator.mediaDevices?.getUserMedia) throw new Error("Браузер не поддерживает доступ к камере");
+          const constraintList = [
+            {
+              audio: false,
+              video: {
+                facingMode: { ideal: "environment" },
+                width: { ideal: 3840 },
+                height: { ideal: 2160 }
+              }
+            },
+            {
+              audio: false,
+              video: {
+                facingMode: { ideal: "environment" },
+                width: { ideal: 1920 },
+                height: { ideal: 1080 }
+              }
+            },
+            { audio: false, video: { facingMode: "environment" } },
+            { audio: false, video: true }
+          ];
+          let stream = null;
+          let lastError = null;
+          for (const constraints of constraintList) {
+            try {
+              stream = await navigator.mediaDevices.getUserMedia(constraints);
+              break;
+            } catch (error) {
+              lastError = error;
+            }
+          }
+          if (!stream) throw lastError || new Error("Камера не открылась");
+          state.stream = stream;
+          dom.video.srcObject = stream;
+          await dom.video.play();
+          state.cameraReady = true;
+          dom.captureBtn.disabled = false;
+          dom.cameraState.classList.add("hidden");
+          liveDetectLoop();
+        } catch (error) {
+          console.warn(error);
+          state.cameraReady = false;
+          state.cameraFallback = true;
+          dom.captureBtn.disabled = false;
+          dom.cameraState.classList.remove("hidden");
+          dom.cameraStateTitle.textContent = "Камера недоступна";
+          dom.cameraStateText.textContent = needsHttpsForCamera()
+            ? "Вы открыли приложение по обычному HTTP. На iPhone камера работает только через HTTPS или через системный выбор фото. Нажмите «Снять через камеру» либо запустите локальный HTTPS-сервер."
+            : "Проверьте разрешение браузера. Можно снять через системную камеру или загрузить изображение вручную.";
+          toast(error.message || "Камера недоступна. Загрузка изображений остаётся доступной.", "warn");
+        }
+      }
+
+      function stopCamera() {
+        if (state.stream) {
+          state.stream.getTracks().forEach(track => track.stop());
+          state.stream = null;
+        }
+        if (state.liveLoop) cancelAnimationFrame(state.liveLoop);
+      }
+
+      function liveDetectLoop() {
+        let last = 0;
+        const tick = (time) => {
+          state.liveLoop = requestAnimationFrame(tick);
+          if (!state.cameraReady || !dom.video.videoWidth || time - last < 900 || state.processing) return;
+          last = time;
+          try {
+            const vw = dom.video.videoWidth;
+            const vh = dom.video.videoHeight;
+            const sample = createCanvas(vw, vh);
+            sample.getContext("2d", { willReadFrequently: true }).drawImage(dom.video, 0, 0, vw, vh);
+            const quad = detectDocument(sample);
+            drawLiveQuad(quad, vw, vh);
+          } catch (error) {
+            dom.livePolygon.classList.add("hidden");
+          }
+        };
+        state.liveLoop = requestAnimationFrame(tick);
+      }
+
+      function drawLiveQuad(quad, videoWidth, videoHeight) {
+        if (!quad) {
+          dom.livePolygon.classList.add("hidden");
+          return;
+        }
+        const rect = dom.video.getBoundingClientRect();
+        const scale = Math.max(rect.width / videoWidth, rect.height / videoHeight);
+        const renderedW = videoWidth * scale;
+        const renderedH = videoHeight * scale;
+        const offsetX = (rect.width - renderedW) / 2;
+        const offsetY = (rect.height - renderedH) / 2;
+        const points = orderCorners(quad).map(p => {
+          const x = offsetX + p.x * scale;
+          const y = offsetY + p.y * scale;
+          return `${(x / rect.width * 100).toFixed(2)},${(y / rect.height * 100).toFixed(2)}`;
+        }).join(" ");
+        dom.livePolygon.setAttribute("points", points);
+        dom.livePolygon.classList.remove("hidden");
+      }
+
+      function renderAll() {
+        renderStatus();
+        renderFilters();
+        renderSliders();
+        renderPages();
+        drawEditor();
+      }
+
+      function renderStatus() {
+        const premium = isPremium();
+        dom.pageCount.textContent = String(state.pages.length);
+        dom.premiumBadge.textContent = premium ? "Premium" : "Free";
+        dom.premiumBtn.classList.toggle("ok", premium);
+        dom.premiumBtn.classList.toggle("warn", !premium);
+        dom.pdfQualityText.textContent = premium ? "Premium: цветной SuperScan до 8K в PDF, минимальное сжатие" : "Free: стандартное качество";
+        dom.premiumStatusText.textContent = premium
+          ? `Premium активен${state.premium.expiresAt ? ` до ${new Date(state.premium.expiresAt).toLocaleDateString("ru-RU")}` : " навсегда"}.`
+          : "Free режим: 5 страниц, стандартный PDF, базовые фильтры.";
+      }
+
+      function renderFilters() {
+        [...dom.filterSegment.querySelectorAll("button")].forEach(button => {
+          const filter = button.dataset.filter;
+          const locked = PREMIUM_FILTERS.has(filter) && !isPremium();
+          button.classList.toggle("active", state.settings.filter === filter);
+          button.classList.toggle("locked", locked);
+          button.title = locked ? "Доступно в Premium" : "";
+        });
+      }
+
+      function renderSliders() {
+        if (dom.sliders.childElementCount) {
+          for (const input of dom.sliders.querySelectorAll("input")) {
+            input.value = state.settings.adjustments[input.dataset.key];
+            input.closest(".slider").querySelector("output").value = input.value;
+          }
+          return;
+        }
+        for (const [key, label, min, max, step] of SLIDER_META) {
+          const wrap = document.createElement("div");
+          wrap.className = "slider";
+          wrap.innerHTML = `
+            <label><span>${label}</span><output>${state.settings.adjustments[key]}</output></label>
+            <input type="range" data-key="${key}" min="${min}" max="${max}" step="${step}" value="${state.settings.adjustments[key]}">
+          `;
+          dom.sliders.appendChild(wrap);
+        }
+      }
+
+      function renderPages() {
+        dom.pagesGrid.innerHTML = "";
+        if (!state.pages.length) {
+          const empty = document.createElement("div");
+          empty.className = "empty-grid";
+          empty.textContent = "Пока нет страниц. Снимите документ камерой или перетащите изображения в окно.";
+          dom.pagesGrid.appendChild(empty);
+          return;
+        }
+        state.pages.forEach((page, index) => {
+          const card = document.createElement("article");
+          card.className = `page-card${page.id === state.currentId ? " active" : ""}`;
+          card.draggable = true;
+          card.dataset.id = page.id;
+          card.innerHTML = `
+            <div class="thumb-wrap"><img loading="lazy" src="${page.thumbDataUrl || page.processedDataUrl}" alt="Страница ${index + 1}"></div>
+            <div class="page-meta">
+              <span>${index + 1}</span>
+              <div class="mini-actions">
+                <button type="button" data-action="rotate" title="Повернуть">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 11a8 8 0 1 1-2.4-5.7M20 4v7h-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                <button type="button" data-action="delete" title="Удалить">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 7h12M10 11v6M14 11v6M9 7l1-3h4l1 3M8 7l1 14h6l1-14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+              </div>
+            </div>
+          `;
+          dom.pagesGrid.appendChild(card);
+        });
+      }
+
+      function getCurrentPage() {
+        return state.pages.find(page => page.id === state.currentId) || null;
+      }
+
+      async function drawEditor() {
+        const token = ++state.renderToken;
+        const page = getCurrentPage();
+        const stage = dom.editorStage;
+        const ctx = dom.editorCanvas.getContext("2d");
+        if (!page) {
+          stage.classList.add("empty");
+          dom.editorEmpty.classList.remove("hidden");
+          dom.cornerSvg.classList.remove("active");
+          ctx.clearRect(0, 0, dom.editorCanvas.width, dom.editorCanvas.height);
+          return;
+        }
+        stage.classList.remove("empty");
+        dom.editorEmpty.classList.add("hidden");
+        const source = await loadImage(state.cropMode ? page.originalDataUrl : page.processedDataUrl);
+        if (token !== state.renderToken) return;
+        const rect = stage.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+        dom.editorCanvas.width = Math.max(1, Math.round(rect.width * dpr));
+        dom.editorCanvas.height = Math.max(1, Math.round(rect.height * dpr));
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, rect.width, rect.height);
+        const scale = Math.min(rect.width / source.width, rect.height / source.height);
+        const w = source.width * scale;
+        const h = source.height * scale;
+        const x = (rect.width - w) / 2;
+        const y = (rect.height - h) / 2;
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = "high";
+        ctx.drawImage(source, x, y, w, h);
+        state.editorFit = { x, y, w, h, scale, sourceWidth: source.width, sourceHeight: source.height, stageWidth: rect.width, stageHeight: rect.height };
+        updateCornerOverlay();
+      }
+
+      function updateCornerOverlay() {
+        const page = getCurrentPage();
+        const fit = state.editorFit;
+        if (!page || !fit || !state.cropMode) {
+          dom.cornerSvg.classList.remove("active");
+          return;
+        }
+        dom.cornerSvg.classList.add("active");
+        dom.cornerSvg.setAttribute("viewBox", `0 0 ${fit.stageWidth} ${fit.stageHeight}`);
+        const points = orderCorners(page.corners).map(p => ({
+          x: fit.x + p.x * fit.scale,
+          y: fit.y + p.y * fit.scale
+        }));
+        const pointString = points.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" ");
+        dom.cornerPolygon.setAttribute("points", pointString);
+        dom.cornerShade.setAttribute("d", `M0 0H${fit.stageWidth}V${fit.stageHeight}H0Z M${pointString.replaceAll(" ", "L")}Z`);
+        dom.cornerHandles.innerHTML = "";
+        points.forEach((p, index) => {
+          const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+          group.dataset.index = index;
+          group.innerHTML = `
+            <circle class="hit" cx="${p.x}" cy="${p.y}" r="28"></circle>
+            <circle class="dot" cx="${p.x}" cy="${p.y}" r="10"></circle>
+          `;
+          dom.cornerHandles.appendChild(group);
+        });
+      }
+
+      function svgPointFromEvent(event) {
+        const fit = state.editorFit;
+        const rect = dom.cornerSvg.getBoundingClientRect();
+        return {
+          x: (event.clientX - rect.left) * fit.stageWidth / rect.width,
+          y: (event.clientY - rect.top) * fit.stageHeight / rect.height
+        };
+      }
+
+      function setCornerFromStage(index, stagePoint) {
+        const page = getCurrentPage();
+        const fit = state.editorFit;
+        if (!page || !fit) return;
+        const x = clamp((stagePoint.x - fit.x) / fit.scale, 0, page.originalWidth);
+        const y = clamp((stagePoint.y - fit.y) / fit.scale, 0, page.originalHeight);
+        page.corners[index] = { x, y };
+        page.corners = orderCorners(page.corners);
+        updateCornerOverlay();
+      }
+
+      async function reprocessCurrent(silent = false) {
+        const page = getCurrentPage();
+        if (!page || state.processing) return;
+        state.processing = true;
+        if (!silent) showLoader("Обновление страницы");
+        try {
+          page.filter = ensureFilterAllowed(state.settings.filter);
+          page.adjustments = { ...state.settings.adjustments };
+          await processPage(page);
+          renderPages();
+          await drawEditor();
+          if (!silent) toast("Страница обновлена.", "ok");
+        } catch (error) {
+          console.error(error);
+          toast("Не удалось обработать страницу.", "danger");
+        } finally {
+          state.processing = false;
+          if (!silent) hideLoader();
+        }
+      }
+
+      async function refreshOutdatedCurrentPage() {
+        const page = getCurrentPage();
+        if (!page || page.processingVersion === PROCESSING_VERSION || state.processing) return;
+        state.processing = true;
+        showLoader("Обновление обработки");
+        try {
+          await processPage(page);
+          renderPages();
+          await drawEditor();
+          toast("Текущая страница обновлена новым алгоритмом.", "ok");
+        } catch (error) {
+          console.error(error);
+        } finally {
+          state.processing = false;
+          hideLoader();
+        }
+      }
+
+      const debouncedReprocess = debounce(() => reprocessCurrent(true), 220);
+
+      function persistPages() {
+        const ok = writeStore(STORE.pages, {
+          pages: state.pages,
+          currentId: state.currentId,
+          savedAt: Date.now()
+        });
+        if (!ok) toast("localStorage переполнен. Уменьшите число страниц или скачайте PDF.", "warn");
+      }
+
+      function persistSettings() {
+        writeStore(STORE.settings, {
+          theme: state.theme,
+          settings: state.settings
+        });
+      }
+
+      function loadState() {
+        const savedSettings = readStore(STORE.settings, null);
+        if (savedSettings) {
+          state.theme = savedSettings.theme || state.theme;
+          state.settings = {
+            filter: savedSettings.settings?.filter || state.settings.filter,
+            adjustments: { ...DEFAULT_ADJUSTMENTS, ...(savedSettings.settings?.adjustments || {}) }
+          };
+        }
+        const savedPremium = readStore(STORE.premium, null);
+        if (savedPremium) state.premium = { ...state.premium, ...savedPremium };
+        if (!isPremium() && PREMIUM_FILTERS.has(state.settings.filter)) state.settings.filter = "color";
+        const savedPages = readStore(STORE.pages, null);
+        if (savedPages?.pages?.length) {
+          state.pages = savedPages.pages.slice(0, MAX_PAGES).map(page => ({
+            ...page,
+            filter: ensureFilterAllowed(page.filter || "color"),
+            adjustments: { ...DEFAULT_ADJUSTMENTS, ...(page.adjustments || {}) }
+          }));
+          state.currentId = state.pages.some(page => page.id === savedPages.currentId) ? savedPages.currentId : state.pages[0].id;
+        }
+        dom.body.dataset.theme = state.theme;
+      }
+
+      function openModal(id) {
+        document.getElementById(id).classList.add("open");
+      }
+
+      function closeModal(id) {
+        document.getElementById(id).classList.remove("open");
+      }
+
+      async function copyText(text, label) {
+        try {
+          await navigator.clipboard.writeText(text);
+        } catch (error) {
+          const input = document.createElement("textarea");
+          input.value = text;
+          document.body.appendChild(input);
+          input.select();
+          document.execCommand("copy");
+          input.remove();
+        }
+        toast(`${label} скопирован`, "ok");
+      }
+
+      function activatePromo() {
+        const input = dom.promoInput.value.trim().toUpperCase();
+        if (!input) {
+          toast("Введите промокод.", "warn");
+          return;
+        }
+        const codes = readStore(STORE.promoCodes, []);
+        const item = codes.find(code => String(code.code).toUpperCase() === input);
+        if (!item) {
+          toast("Промокод не найден в локальном списке.", "danger");
+          return;
+        }
+        if (item.deleted) {
+          toast("Промокод удалён.", "danger");
+          return;
+        }
+        if (item.expiresAt && Date.now() > item.expiresAt) {
+          toast("Срок действия промокода истёк.", "danger");
+          return;
+        }
+        const max = Number(item.maxActivations || 1);
+        const used = Number(item.activations || 0);
+        if (max > 0 && used >= max) {
+          toast("Лимит активаций промокода исчерпан.", "danger");
+          return;
+        }
+        item.activations = used + 1;
+        item.lastActivatedAt = Date.now();
+        writeStore(STORE.promoCodes, codes);
+        state.premium = {
+          active: true,
+          code: item.code,
+          expiresAt: item.expiresAt || null,
+          activatedAt: Date.now()
+        };
+        writeStore(STORE.premium, state.premium);
+        closeModal("promoModal");
+        closeModal("premiumModal");
+        renderAll();
+        toast("Premium активен.", "ok");
+      }
+
+      async function applySettingsToAll() {
+        if (!state.pages.length) {
+          toast("Нет страниц для обработки.", "warn");
+          return;
+        }
+        state.processing = true;
+        showLoader("Применение ко всем");
+        try {
+          for (let i = 0; i < state.pages.length; i++) {
+            dom.loaderText.textContent = `Страница ${i + 1} из ${state.pages.length}`;
+            state.pages[i].filter = ensureFilterAllowed(state.settings.filter);
+            state.pages[i].adjustments = { ...state.settings.adjustments };
+            await processPage(state.pages[i], { skipPersist: true });
+            await nextFrame();
+          }
+          persistPages();
+          renderAll();
+          toast("Настройки применены ко всем страницам.", "ok");
+        } catch (error) {
+          console.error(error);
+          toast("Не удалось применить настройки ко всем страницам.", "danger");
+        } finally {
+          state.processing = false;
+          hideLoader();
+        }
+      }
+
+      async function rotateCurrentPage() {
+        const page = getCurrentPage();
+        if (!page || state.processing) return;
+        page.rotation = ((page.rotation || 0) + 90) % 360;
+        await reprocessCurrent(false);
+      }
+
+      async function downloadPdf() {
+        if (!state.pages.length) {
+          toast("Нет страниц для PDF.", "warn");
+          return;
+        }
+        if (!window.jspdf?.jsPDF) {
+          toast("jsPDF ещё загружается. Повторите через секунду.", "warn");
+          return;
+        }
+        const filename = `scan_${formatFileDate(new Date())}.pdf`;
+        const handoffWindow = openPdfHandoffWindow(filename);
+        state.processing = true;
+        showLoader("Сборка PDF");
+        try {
+          const { jsPDF } = window.jspdf;
+          const first = state.pages[0];
+          const firstOrientation = first.width > first.height ? "landscape" : "portrait";
+          const pdf = new jsPDF({ unit: "mm", format: "a4", orientation: firstOrientation, compress: !isPremium() });
+          for (let i = 0; i < state.pages.length; i++) {
+            const page = state.pages[i];
+            dom.loaderText.textContent = `PDF: страница ${i + 1} из ${state.pages.length}`;
+            let imageDataUrl = page.processedDataUrl;
+            let imageWidth = page.width;
+            let imageHeight = page.height;
+            let transientCanvas = null;
+            if (isPremium() && ensureFilterAllowed(page.filter) === "super") {
+              dom.loaderText.textContent = `${isIOSLike() ? "PDF iPhone SuperScan" : "PDF 8K SuperScan"}: страница ${i + 1} из ${state.pages.length}`;
+              transientCanvas = await renderPageCanvas(page, "pdf");
+              imageDataUrl = canvasToJpeg(transientCanvas, .96);
+              imageWidth = transientCanvas.width;
+              imageHeight = transientCanvas.height;
+            }
+            const orientation = imageWidth > imageHeight ? "landscape" : "portrait";
+            if (i > 0) pdf.addPage("a4", orientation);
+            const pw = pdf.internal.pageSize.getWidth();
+            const ph = pdf.internal.pageSize.getHeight();
+            const margin = isPremium() ? 4 : 6;
+            const maxW = pw - margin * 2;
+            const maxH = ph - margin * 2;
+            const ratio = Math.min(maxW / imageWidth, maxH / imageHeight);
+            const w = imageWidth * ratio;
+            const h = imageHeight * ratio;
+            const x = (pw - w) / 2;
+            const y = (ph - h) / 2;
+            pdf.addImage(imageDataUrl, "JPEG", x, y, w, h, undefined, isPremium() ? "NONE" : "MEDIUM");
+            if (transientCanvas) {
+              transientCanvas.width = 1;
+              transientCanvas.height = 1;
+            }
+            await nextFrame();
+          }
+          await deliverPdf(pdf, filename, handoffWindow);
+        } catch (error) {
+          console.error(error);
+          if (handoffWindow && !handoffWindow.closed) handoffWindow.close();
+          toast("Не удалось создать PDF.", "danger");
+        } finally {
+          state.processing = false;
+          hideLoader();
+        }
+      }
+
+      function formatFileDate(date) {
+        const pad = n => String(n).padStart(2, "0");
+        return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}_${pad(date.getHours())}-${pad(date.getMinutes())}`;
+      }
+
+      function openPdfHandoffWindow(filename) {
+        if (!isIOSLike()) return null;
+        try {
+          const win = window.open("", "_blank");
+          if (!win) return null;
+          win.document.open();
+          win.document.write(`
+            <!doctype html>
+            <html lang="ru">
+              <head>
+                <meta charset="utf-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1">
+                <title>${filename}</title>
+                <style>
+                  body {
+                    margin: 0;
+                    min-height: 100vh;
+                    display: grid;
+                    place-items: center;
+                    background: #0b0f14;
+                    color: #f4f7fb;
+                    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+                  }
+                  div {
+                    max-width: 360px;
+                    padding: 20px;
+                    text-align: center;
+                    line-height: 1.45;
+                  }
+                </style>
+              </head>
+              <body><div>Готовим PDF. Когда файл откроется, нажмите «Поделиться» и выберите «Сохранить в Файлы».</div></body>
+            </html>
+          `);
+          win.document.close();
+          return win;
+        } catch (error) {
+          return null;
+        }
+      }
+
+      async function deliverPdf(pdf, filename, handoffWindow = null) {
+        const blob = pdf.output("blob");
+        const file = typeof File !== "undefined" ? new File([blob], filename, { type: "application/pdf" }) : null;
+
+        if (file && navigator.canShare && navigator.share) {
+          try {
+            if (navigator.canShare({ files: [file] })) {
+              await navigator.share({ files: [file], title: filename });
+              handoffWindow?.close();
+              toast("PDF передан в меню iPhone.", "ok");
+              return;
+            }
+          } catch (error) {
+            console.warn("Share PDF fallback", error);
+          }
+        }
+
+        const url = URL.createObjectURL(blob);
+        if (handoffWindow && !handoffWindow.closed) {
+          handoffWindow.location.href = url;
+          window.setTimeout(() => URL.revokeObjectURL(url), 120000);
+          toast("PDF открыт в новой вкладке. На iPhone нажмите «Поделиться» → «Сохранить в Файлы».", "ok");
+          return;
+        }
+
+        if (isIOSLike()) {
+          const opened = window.open(url, "_blank");
+          if (!opened) {
+            const a = document.createElement("a");
+            a.href = url;
+            a.target = "_blank";
+            a.rel = "noopener";
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+          }
+          window.setTimeout(() => URL.revokeObjectURL(url), 120000);
+          toast("PDF открыт. На iPhone сохраните его через меню «Поделиться».", "ok");
+          return;
+        }
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.setTimeout(() => URL.revokeObjectURL(url), 60000);
+        toast("PDF готов.", "ok");
+      }
+
+      function bindEvents() {
+        dom.captureBtn.addEventListener("click", captureFrame);
+        dom.retryCameraBtn.addEventListener("click", startCamera);
+        dom.iosCaptureBtn.addEventListener("click", () => dom.captureFileInput.click());
+        dom.uploadBtn.addEventListener("click", () => dom.fileInput.click());
+        dom.stateUploadBtn.addEventListener("click", () => dom.fileInput.click());
+        dom.nextScanBtn.addEventListener("click", () => {
+          document.getElementById("cameraSection").scrollIntoView({ behavior: "smooth" });
+          toast("Камера готова к следующему скану.", "ok");
+        });
+        dom.fileInput.addEventListener("change", event => {
+          handleFiles(event.target.files);
+          event.target.value = "";
+        });
+        dom.captureFileInput.addEventListener("change", event => {
+          handleFiles(event.target.files);
+          event.target.value = "";
+        });
+
+        dom.themeBtn.addEventListener("click", () => {
+          state.theme = state.theme === "dark" ? "light" : "dark";
+          dom.body.dataset.theme = state.theme;
+          persistSettings();
+        });
+
+        dom.premiumBtn.addEventListener("click", () => openModal("premiumModal"));
+        dom.openPremiumBtn.addEventListener("click", () => openModal("premiumModal"));
+        dom.havePromoBtn.addEventListener("click", () => {
+          closeModal("premiumModal");
+          openModal("promoModal");
+          window.setTimeout(() => dom.promoInput.focus(), 60);
+        });
+        dom.activatePromoBtn.addEventListener("click", activatePromo);
+        dom.promoInput.addEventListener("keydown", event => {
+          if (event.key === "Enter") activatePromo();
+        });
+        dom.copyCardBtn.addEventListener("click", () => copyText(dom.cardNumber.textContent.trim(), "Номер карты"));
+        dom.copyEmailBtn.addEventListener("click", () => copyText(dom.supportEmail.textContent.trim(), "Email"));
+        document.querySelectorAll("[data-close-modal]").forEach(button => {
+          button.addEventListener("click", () => closeModal(button.dataset.closeModal));
+        });
+        document.querySelectorAll(".modal-backdrop").forEach(backdrop => {
+          backdrop.addEventListener("click", event => {
+            if (event.target === backdrop) backdrop.classList.remove("open");
+          });
+        });
+
+        dom.filterSegment.addEventListener("click", event => {
+          const button = event.target.closest("button[data-filter]");
+          if (!button) return;
+          const filter = button.dataset.filter;
+          if (PREMIUM_FILTERS.has(filter) && !isPremium()) {
+            toast("Этот фильтр доступен в Premium.", "warn");
+            openModal("premiumModal");
+            return;
+          }
+          state.settings.filter = filter;
+          const page = getCurrentPage();
+          if (page) {
+            page.filter = filter;
+            page.adjustments = { ...state.settings.adjustments };
+          }
+          persistSettings();
+          renderFilters();
+          debouncedReprocess();
+        });
+
+        dom.sliders.addEventListener("input", event => {
+          const input = event.target.closest("input[type='range']");
+          if (!input) return;
+          const value = Number(input.value);
+          const key = input.dataset.key;
+          state.settings.adjustments[key] = value;
+          input.closest(".slider").querySelector("output").value = value;
+          const page = getCurrentPage();
+          if (page) page.adjustments = { ...state.settings.adjustments };
+          persistSettings();
+          debouncedReprocess();
+        });
+
+        dom.applyAllBtn.addEventListener("click", applySettingsToAll);
+        dom.resetSettingsBtn.addEventListener("click", () => {
+          state.settings.adjustments = { ...DEFAULT_ADJUSTMENTS };
+          persistSettings();
+          renderSliders();
+          debouncedReprocess();
+          toast("Настройки сброшены.", "ok");
+        });
+        dom.saveStateBtn.addEventListener("click", () => {
+          persistPages();
+          persistSettings();
+          toast("Состояние сохранено.", "ok");
+        });
+        dom.clearPagesBtn.addEventListener("click", () => {
+          state.pages = [];
+          state.currentId = null;
+          persistPages();
+          renderAll();
+          toast("Страницы очищены.", "ok");
+        });
+        dom.downloadPdfBtn.addEventListener("click", downloadPdf);
+        dom.rotateCurrentBtn.addEventListener("click", rotateCurrentPage);
+        dom.cornerModeBtn.addEventListener("click", () => {
+          if (!getCurrentPage()) return;
+          state.cropMode = !state.cropMode;
+          dom.cornerModeBtn.textContent = state.cropMode ? "Просмотр" : "Углы";
+          drawEditor();
+        });
+        dom.applyCornersBtn.addEventListener("click", () => {
+          if (!getCurrentPage()) return;
+          state.cropMode = false;
+          dom.cornerModeBtn.textContent = "Углы";
+          reprocessCurrent(false);
+        });
+
+        dom.pagesGrid.addEventListener("click", async event => {
+          const card = event.target.closest(".page-card");
+          if (!card) return;
+          const pageId = card.dataset.id;
+          const action = event.target.closest("button")?.dataset.action;
+          state.currentId = pageId;
+          const page = getCurrentPage();
+          if (!page) return;
+          if (action === "delete") {
+            state.pages = state.pages.filter(item => item.id !== pageId);
+            state.currentId = state.pages[0]?.id || null;
+            persistPages();
+            renderAll();
+            toast("Страница удалена.", "ok");
+            return;
+          }
+          if (action === "rotate") {
+            page.rotation = ((page.rotation || 0) + 90) % 360;
+            await processPage(page);
+            renderAll();
+            return;
+          }
+          state.settings.filter = page.filter || state.settings.filter;
+          state.settings.adjustments = { ...DEFAULT_ADJUSTMENTS, ...(page.adjustments || {}) };
+          state.cropMode = false;
+          dom.cornerModeBtn.textContent = "Углы";
+          persistSettings();
+          renderAll();
+        });
+
+        dom.pagesGrid.addEventListener("dragstart", event => {
+          const card = event.target.closest(".page-card");
+          if (!card) return;
+          state.dragPageId = card.dataset.id;
+          card.classList.add("dragging");
+          event.dataTransfer.effectAllowed = "move";
+          event.dataTransfer.setData("text/plain", state.dragPageId);
+        });
+        dom.pagesGrid.addEventListener("dragend", event => {
+          event.target.closest(".page-card")?.classList.remove("dragging");
+          state.dragPageId = null;
+        });
+        dom.pagesGrid.addEventListener("dragover", event => {
+          if (event.target.closest(".page-card")) event.preventDefault();
+        });
+        dom.pagesGrid.addEventListener("drop", event => {
+          const target = event.target.closest(".page-card");
+          if (!target || !state.dragPageId) return;
+          event.preventDefault();
+          const from = state.pages.findIndex(page => page.id === state.dragPageId);
+          const to = state.pages.findIndex(page => page.id === target.dataset.id);
+          if (from < 0 || to < 0 || from === to) return;
+          const [moved] = state.pages.splice(from, 1);
+          state.pages.splice(to, 0, moved);
+          persistPages();
+          renderPages();
+        });
+
+        dom.cornerSvg.addEventListener("pointerdown", event => {
+          const group = event.target.closest("g[data-index]");
+          if (!group) return;
+          state.draggingCorner = Number(group.dataset.index);
+          dom.cornerSvg.setPointerCapture(event.pointerId);
+          setCornerFromStage(state.draggingCorner, svgPointFromEvent(event));
+        });
+        dom.cornerSvg.addEventListener("pointermove", event => {
+          if (state.draggingCorner === null) return;
+          event.preventDefault();
+          setCornerFromStage(state.draggingCorner, svgPointFromEvent(event));
+        });
+        dom.cornerSvg.addEventListener("pointerup", event => {
+          if (state.draggingCorner === null) return;
+          dom.cornerSvg.releasePointerCapture(event.pointerId);
+          state.draggingCorner = null;
+          persistPages();
+        });
+        dom.cornerSvg.addEventListener("pointercancel", () => {
+          state.draggingCorner = null;
+        });
+
+        window.addEventListener("resize", debounce(drawEditor, 120));
+
+        let dragDepth = 0;
+        window.addEventListener("dragenter", event => {
+          if ([...event.dataTransfer?.items || []].some(item => item.kind === "file")) {
+            dragDepth++;
+            dom.dropCatcher.classList.add("active");
+          }
+        });
+        window.addEventListener("dragover", event => {
+          event.preventDefault();
+        });
+        window.addEventListener("dragleave", () => {
+          dragDepth = Math.max(0, dragDepth - 1);
+          if (!dragDepth) dom.dropCatcher.classList.remove("active");
+        });
+        window.addEventListener("drop", event => {
+          event.preventDefault();
+          dragDepth = 0;
+          dom.dropCatcher.classList.remove("active");
+          if (event.dataTransfer?.files?.length) handleFiles(event.dataTransfer.files);
+        });
+
+        document.querySelectorAll(".bottom-nav button").forEach(button => {
+          button.addEventListener("click", () => {
+            document.getElementById(button.dataset.jump).scrollIntoView({ behavior: "smooth", block: "start" });
+            document.querySelectorAll(".bottom-nav button").forEach(item => item.classList.toggle("active", item === button));
+          });
+        });
+      }
+
+      function init() {
+        loadState();
+        renderAll();
+        bindEvents();
+        startCamera();
+        window.setTimeout(refreshOutdatedCurrentPage, 250);
+      }
+
+      init();
+    })();
+  </script>
+</body>
+</html>
