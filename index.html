@@ -2772,18 +2772,18 @@
             }
             const publicDb = await fetchPublicPromoDb();
             if (!publicDb.ok) {
-              toast("promo-codes.json не найден рядом с index.html. Проверьте загрузку файла на GitHub.", "danger");
+              toast("Не удалось проверить промокод.", "danger");
               console.warn("Promo DB attempts", publicDb.attempts);
               return;
             }
             if (!publicDb.codes.length) {
-              toast("promo-codes.json загружен, но в нём 0 кодов.", "danger");
+              toast("Промокод не найден.", "danger");
               console.warn("Promo DB is empty", publicDb.url);
               return;
             }
             item = publicDb.codes.find(code => String(code.codeHash || code.hash || "").toLowerCase() === hash) || null;
             if (!item) {
-              toast(`Промокод не найден в базе (${publicDb.codes.length} кодов).`, "danger");
+              toast("Промокод не найден.", "danger");
               console.warn("Promo code hash mismatch", { url: publicDb.url, hash, count: publicDb.codes.length });
               return;
             }
@@ -2943,7 +2943,7 @@
         if (file && navigator.canShare && navigator.share) {
           try {
             if (navigator.canShare({ files: [file] })) {
-              await navigator.share({ files: [file], title: filename });
+              await navigator.share({ files: [file] });
               toast("PDF передан в меню iPhone.", "ok");
               return;
             }
@@ -3078,7 +3078,7 @@
           }
           if (navigator.canShare && navigator.share && navigator.canShare({ files: [state.lastPdfFile] })) {
             try {
-              await navigator.share({ files: [state.lastPdfFile], title: state.lastPdfFile.name });
+              await navigator.share({ files: [state.lastPdfFile] });
               return;
             } catch (error) {
               console.warn(error);
