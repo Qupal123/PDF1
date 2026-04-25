@@ -2,20 +2,13 @@
   "app": "PDF Scanner",
   "type": "public-promo-db",
   "version": 2,
-  "generatedAt": 1777138716279,
+  "generatedAt": 1777138766239,
   "note": "Public file for GitHub Pages. Contains SHA-256 hashes, not real promo codes.",
   "codes": [
     {
-      "codeHash": "5c8da18752f4c5e0e885a79f4b43ad288b3285213e26ad1eef2db0a5abfee063",
-      "createdAt": 1777138713775,
+      "codeHash": "e9c50a8650442900598d85e78ed717b3d67a427662f49eb2be92f5963e8de214",
+      "createdAt": 1777138762375,
       "expiresAt": null,
-      "maxActivations": 1,
-      "revoked": false
-    },
-    {
-      "codeHash": "e50e897aa2bde488ca61f19dbf0a65e7674bf1569a140dae002a26154fcc4cff",
-      "createdAt": 1777138308134,
-      "expiresAt": 1777743108134,
       "maxActivations": 1,
       "revoked": false
     }
