@@ -1026,6 +1026,8 @@
         premium: "pdfScanner.premium.v1",
         promoCodes: "pdfScanner.promoCodes.v1"
       };
+      const IMAGE_DB_NAME = "pdfScanner.images.v1";
+      const IMAGE_STORE = "images";
       const PROMO_DB_URL = "promo-codes.json";
 
       const MAX_PAGES = 25;
@@ -1035,7 +1037,7 @@
       const STANDARD_FREE_MAX_SIDE = 1650;
       const SUPER_PREVIEW_MAX_SIDE = 4096;
       const SUPER_PDF_MAX_SIDE = 8192;
-      const IOS_PDF_MAX_SIDE = 4096;
+      const IOS_PDF_MAX_SIDE = 3072;
       const ORIGINAL_PREMIUM_MAX_SIDE = 4096;
       const ORIGINAL_FREE_MAX_SIDE = 1900;
       const FILTERS = ["original", "color", "gray", "bw", "super"];
@@ -1128,6 +1130,7 @@
         cameraReady: false,
         cameraFallback: false,
         processing: false,
+        applyAllQueued: false,
         liveLoop: 0,
         cropMode: false,
         editorFit: null,
@@ -1148,6 +1151,8 @@
         renderToken: 0
       };
 
+      let imageDbPromise = null;
+
       function readStore(key, fallback) {
         try {
           const raw = localStorage.getItem(key);
@@ -1165,6 +1170,114 @@
           console.warn("Storage write failed", error);
           return false;
         }
+      }
+
+      function openImageDb() {
+        if (!("indexedDB" in window)) return Promise.resolve(null);
+        if (imageDbPromise) return imageDbPromise;
+        imageDbPromise = new Promise(resolve => {
+          const request = indexedDB.open(IMAGE_DB_NAME, 1);
+          request.onupgradeneeded = () => {
+            const db = request.result;
+            if (!db.objectStoreNames.contains(IMAGE_STORE)) db.createObjectStore(IMAGE_STORE);
+          };
+          request.onsuccess = () => resolve(request.result);
+          request.onerror = () => {
+            console.warn("IndexedDB unavailable", request.error);
+            resolve(null);
+          };
+        });
+        return imageDbPromise;
+      }
+
+      async function imageDbPut(key, value) {
+        const db = await openImageDb();
+        if (!db) return false;
+        return new Promise(resolve => {
+          const tx = db.transaction(IMAGE_STORE, "readwrite");
+          tx.objectStore(IMAGE_STORE).put(value, key);
+          tx.oncomplete = () => resolve(true);
+          tx.onerror = () => {
+            console.warn("IndexedDB put failed", tx.error);
+            resolve(false);
+          };
+        });
+      }
+
+      async function imageDbGet(key) {
+        const db = await openImageDb();
+        if (!db) return null;
+        return new Promise(resolve => {
+          const tx = db.transaction(IMAGE_STORE, "readonly");
+          const request = tx.objectStore(IMAGE_STORE).get(key);
+          request.onsuccess = () => resolve(request.result || null);
+          request.onerror = () => resolve(null);
+        });
+      }
+
+      async function imageDbDelete(key) {
+        const db = await openImageDb();
+        if (!db) return;
+        return new Promise(resolve => {
+          const tx = db.transaction(IMAGE_STORE, "readwrite");
+          tx.objectStore(IMAGE_STORE).delete(key);
+          tx.oncomplete = () => resolve();
+          tx.onerror = () => resolve();
+        });
+      }
+
+      async function imageDbClear() {
+        const db = await openImageDb();
+        if (!db) return;
+        return new Promise(resolve => {
+          const tx = db.transaction(IMAGE_STORE, "readwrite");
+          tx.objectStore(IMAGE_STORE).clear();
+          tx.oncomplete = () => resolve();
+          tx.onerror = () => resolve();
+        });
+      }
+
+      function pageImageKey(page, type) {
+        return page[`${type}Key`] || `page:${page.id}:${type}`;
+      }
+
+      async function savePageImages(page) {
+        if (!page?.id) return;
+        for (const type of ["original", "processed", "thumb"]) {
+          const field = `${type}DataUrl`;
+          if (!page[field]) continue;
+          const key = pageImageKey(page, type);
+          page[`${type}Key`] = key;
+          await imageDbPut(key, page[field]);
+        }
+      }
+
+      async function hydratePageImages(page) {
+        if (!page?.id) return page;
+        if (!page.originalKey) page.originalKey = pageImageKey(page, "original");
+        if (!page.processedKey) page.processedKey = pageImageKey(page, "processed");
+        if (!page.thumbKey) page.thumbKey = pageImageKey(page, "thumb");
+        const hadLegacyImages = Boolean(page.originalDataUrl || page.processedDataUrl || page.thumbDataUrl);
+        if (!page.originalDataUrl) page.originalDataUrl = await imageDbGet(page.originalKey);
+        if (!page.processedDataUrl) page.processedDataUrl = await imageDbGet(page.processedKey);
+        if (!page.thumbDataUrl) page.thumbDataUrl = await imageDbGet(page.thumbKey);
+        if (hadLegacyImages) await savePageImages(page);
+        if (!page.processedDataUrl && page.originalDataUrl) page.processedDataUrl = page.originalDataUrl;
+        if (!page.thumbDataUrl && page.processedDataUrl) page.thumbDataUrl = page.processedDataUrl;
+        return page;
+      }
+
+      async function deletePageImages(page) {
+        if (!page) return;
+        await Promise.all(["original", "processed", "thumb"].map(type => imageDbDelete(pageImageKey(page, type))));
+      }
+
+      function stripPageForStorage(page) {
+        const copy = { ...page };
+        delete copy.originalDataUrl;
+        delete copy.processedDataUrl;
+        delete copy.thumbDataUrl;
+        return copy;
       }
 
       function toast(message, type = "ok") {
@@ -2073,6 +2186,8 @@
       }
 
       async function renderPageCanvas(page, context = "preview") {
+        if (!page.originalDataUrl) await hydratePageImages(page);
+        if (!page.originalDataUrl) throw new Error("Не найден оригинал страницы");
         const image = await loadImage(page.originalDataUrl);
         const source = canvasFromImage(image);
         const mode = ensureFilterAllowed(page.filter || state.settings.filter);
@@ -2095,6 +2210,7 @@
         page.processingVersion = PROCESSING_VERSION;
         page.filter = mode;
         page.adjustments = { ...(page.adjustments || state.settings.adjustments) };
+        await savePageImages(page);
         if (!options.skipPersist) persistPages();
         return page;
       }
@@ -2434,7 +2550,15 @@
         }
         stage.classList.remove("empty");
         dom.editorEmpty.classList.add("hidden");
-        const source = await loadImage(state.cropMode ? page.originalDataUrl : page.processedDataUrl);
+        await hydratePageImages(page);
+        const sourceUrl = state.cropMode ? page.originalDataUrl : (page.processedDataUrl || page.originalDataUrl);
+        if (!sourceUrl) {
+          stage.classList.add("empty");
+          dom.editorEmpty.classList.remove("hidden");
+          dom.editorEmpty.textContent = "Изображение страницы не найдено. Добавьте страницу заново.";
+          return;
+        }
+        const source = await loadImage(sourceUrl);
         if (token !== state.renderToken) return;
         const rect = stage.getBoundingClientRect();
         const dpr = window.devicePixelRatio || 1;
@@ -2542,14 +2666,15 @@
       }
 
       const debouncedReprocess = debounce(() => reprocessCurrent(true), 220);
+      const debouncedApplyAll = debounce(() => applySettingsToAll({ silent: true }), 420);
 
       function persistPages() {
         const ok = writeStore(STORE.pages, {
-          pages: state.pages,
+          pages: state.pages.map(stripPageForStorage),
           currentId: state.currentId,
           savedAt: Date.now()
         });
-        if (!ok) toast("localStorage переполнен. Уменьшите число страниц или скачайте PDF.", "warn");
+        if (!ok) toast("Не удалось сохранить метаданные страниц. Изображения уже сохранены отдельно.", "warn");
       }
 
       function persistSettings() {
@@ -2559,7 +2684,7 @@
         });
       }
 
-      function loadState() {
+      async function loadState() {
         const savedSettings = readStore(STORE.settings, null);
         if (savedSettings) {
           state.theme = savedSettings.theme || state.theme;
@@ -2578,7 +2703,9 @@
             filter: ensureFilterAllowed(page.filter || "color"),
             adjustments: { ...DEFAULT_ADJUSTMENTS, ...(page.adjustments || {}) }
           }));
+          for (const page of state.pages) await hydratePageImages(page);
           state.currentId = state.pages.some(page => page.id === savedPages.currentId) ? savedPages.currentId : state.pages[0].id;
+          persistPages();
         }
         dom.body.dataset.theme = state.theme;
       }
@@ -2686,13 +2813,19 @@
         toast("Premium активен.", "ok");
       }
 
-      async function applySettingsToAll() {
+      async function applySettingsToAll(options = {}) {
+        const silent = Boolean(options.silent);
         if (!state.pages.length) {
-          toast("Нет страниц для обработки.", "warn");
+          if (!silent) toast("Нет страниц для обработки.", "warn");
+          return;
+        }
+        if (state.processing) {
+          if (silent) state.applyAllQueued = true;
+          else toast("Дождитесь завершения текущей обработки.", "warn");
           return;
         }
         state.processing = true;
-        showLoader("Применение ко всем");
+        showLoader(silent ? "Обновление всех страниц" : "Применение ко всем");
         try {
           for (let i = 0; i < state.pages.length; i++) {
             dom.loaderText.textContent = `Страница ${i + 1} из ${state.pages.length}`;
@@ -2703,13 +2836,17 @@
           }
           persistPages();
           renderAll();
-          toast("Настройки применены ко всем страницам.", "ok");
+          if (!silent) toast("Настройки применены ко всем страницам.", "ok");
         } catch (error) {
           console.error(error);
           toast("Не удалось применить настройки ко всем страницам.", "danger");
         } finally {
           state.processing = false;
           hideLoader();
+          if (state.applyAllQueued) {
+            state.applyAllQueued = false;
+            debouncedApplyAll();
+          }
         }
       }
 
@@ -2735,10 +2872,12 @@
         try {
           const { jsPDF } = window.jspdf;
           const first = state.pages[0];
-          const firstOrientation = first.width > first.height ? "landscape" : "portrait";
+          await hydratePageImages(first);
+          const firstOrientation = (first.width || 1) > (first.height || 2) ? "landscape" : "portrait";
           const pdf = new jsPDF({ unit: "mm", format: "a4", orientation: firstOrientation, compress: !isPremium() });
           for (let i = 0; i < state.pages.length; i++) {
             const page = state.pages[i];
+            await hydratePageImages(page);
             dom.loaderText.textContent = `PDF: страница ${i + 1} из ${state.pages.length}`;
             let imageDataUrl = page.processedDataUrl;
             let imageWidth = page.width;
@@ -2748,6 +2887,12 @@
               dom.loaderText.textContent = `${isIOSLike() ? "PDF iPhone SuperScan" : "PDF 8K SuperScan"}: страница ${i + 1} из ${state.pages.length}`;
               transientCanvas = await renderPageCanvas(page, "pdf");
               imageDataUrl = canvasToJpeg(transientCanvas, .96);
+              imageWidth = transientCanvas.width;
+              imageHeight = transientCanvas.height;
+            }
+            if (!imageDataUrl) {
+              transientCanvas = await renderPageCanvas(page, "preview");
+              imageDataUrl = canvasToJpeg(transientCanvas, isPremium() ? .9 : .82);
               imageWidth = transientCanvas.width;
               imageHeight = transientCanvas.height;
             }
@@ -2763,7 +2908,7 @@
             const h = imageHeight * ratio;
             const x = (pw - w) / 2;
             const y = (ph - h) / 2;
-            pdf.addImage(imageDataUrl, "JPEG", x, y, w, h, undefined, isPremium() ? "NONE" : "MEDIUM");
+            pdf.addImage(imageDataUrl, "JPEG", x, y, w, h, undefined, isPremium() ? (isIOSLike() ? "FAST" : "NONE") : "MEDIUM");
             if (transientCanvas) {
               transientCanvas.width = 1;
               transientCanvas.height = 1;
@@ -2879,14 +3024,14 @@
             return;
           }
           state.settings.filter = filter;
-          const page = getCurrentPage();
-          if (page) {
+          for (const page of state.pages) {
             page.filter = filter;
             page.adjustments = { ...state.settings.adjustments };
           }
           persistSettings();
+          persistPages();
           renderFilters();
-          debouncedReprocess();
+          debouncedApplyAll();
         });
 
         dom.sliders.addEventListener("input", event => {
@@ -2896,18 +3041,20 @@
           const key = input.dataset.key;
           state.settings.adjustments[key] = value;
           input.closest(".slider").querySelector("output").value = value;
-          const page = getCurrentPage();
-          if (page) page.adjustments = { ...state.settings.adjustments };
+          for (const page of state.pages) page.adjustments = { ...state.settings.adjustments };
           persistSettings();
-          debouncedReprocess();
+          persistPages();
+          debouncedApplyAll();
         });
 
-        dom.applyAllBtn.addEventListener("click", applySettingsToAll);
+        dom.applyAllBtn.addEventListener("click", () => applySettingsToAll());
         dom.resetSettingsBtn.addEventListener("click", () => {
           state.settings.adjustments = { ...DEFAULT_ADJUSTMENTS };
+          for (const page of state.pages) page.adjustments = { ...state.settings.adjustments };
           persistSettings();
+          persistPages();
           renderSliders();
-          debouncedReprocess();
+          debouncedApplyAll();
           toast("Настройки сброшены.", "ok");
         });
         dom.saveStateBtn.addEventListener("click", () => {
@@ -2918,6 +3065,7 @@
         dom.clearPagesBtn.addEventListener("click", () => {
           state.pages = [];
           state.currentId = null;
+          imageDbClear();
           persistPages();
           renderAll();
           toast("Страницы очищены.", "ok");
@@ -2961,6 +3109,7 @@
           const page = getCurrentPage();
           if (!page) return;
           if (action === "delete") {
+            await deletePageImages(page);
             state.pages = state.pages.filter(item => item.id !== pageId);
             state.currentId = state.pages[0]?.id || null;
             persistPages();
@@ -3063,8 +3212,8 @@
         });
       }
 
-      function init() {
-        loadState();
+      async function init() {
+        await loadState();
         renderAll();
         bindEvents();
         startCamera();
