@@ -1026,6 +1026,7 @@
         premium: "pdfScanner.premium.v1",
         promoCodes: "pdfScanner.promoCodes.v1"
       };
+      const PROMO_DB_URL = "promo-codes.json";
 
       const MAX_PAGES = 25;
       const FREE_LIMIT = 5;
@@ -1215,6 +1216,29 @@
 
       function uid() {
         return `p_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+      }
+
+      function normalizePromoCode(code) {
+        return String(code || "").trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
+      }
+
+      async function sha256Hex(value) {
+        if (!crypto?.subtle) return null;
+        const data = new TextEncoder().encode(value);
+        const digest = await crypto.subtle.digest("SHA-256", data);
+        return [...new Uint8Array(digest)].map(byte => byte.toString(16).padStart(2, "0")).join("");
+      }
+
+      async function fetchPublicPromoDb() {
+        try {
+          const response = await fetch(`${PROMO_DB_URL}?v=${Date.now()}`, { cache: "no-store" });
+          if (!response.ok) return [];
+          const payload = await response.json();
+          return Array.isArray(payload) ? payload : Array.isArray(payload.codes) ? payload.codes : [];
+        } catch (error) {
+          console.warn("Promo DB fetch failed", error);
+          return null;
+        }
       }
 
       function clamp(value, min, max) {
@@ -2504,39 +2528,71 @@
         toast(`${label} скопирован`, "ok");
       }
 
-      function activatePromo() {
-        const input = dom.promoInput.value.trim().toUpperCase();
+      async function activatePromo() {
+        const input = normalizePromoCode(dom.promoInput.value);
         if (!input) {
           toast("Введите промокод.", "warn");
           return;
         }
-        const codes = readStore(STORE.promoCodes, []);
-        const item = codes.find(code => String(code.code).toUpperCase() === input);
-        if (!item) {
-          toast("Промокод не найден в локальном списке.", "danger");
-          return;
+        dom.activatePromoBtn.disabled = true;
+        showLoader("Проверка промокода");
+        let item = null;
+        let source = "local";
+        try {
+          const codes = readStore(STORE.promoCodes, []);
+          item = codes.find(code => normalizePromoCode(code.code) === input) || null;
+          if (item) {
+            if (item.deleted) {
+              toast("Промокод удалён.", "danger");
+              return;
+            }
+            if (item.expiresAt && Date.now() > item.expiresAt) {
+              toast("Срок действия промокода истёк.", "danger");
+              return;
+            }
+            const max = Number(item.maxActivations || 1);
+            const used = Number(item.activations || 0);
+            if (max > 0 && used >= max) {
+              toast("Лимит активаций промокода исчерпан локально.", "danger");
+              return;
+            }
+            item.activations = used + 1;
+            item.lastActivatedAt = Date.now();
+            writeStore(STORE.promoCodes, codes);
+          } else {
+            source = "public";
+            const hash = await sha256Hex(input);
+            if (!hash) {
+              toast("Браузер не поддерживает безопасную проверку промокода.", "danger");
+              return;
+            }
+            const publicCodes = await fetchPublicPromoDb();
+            if (publicCodes === null) {
+              toast("Не удалось загрузить базу промокодов.", "danger");
+              return;
+            }
+            item = publicCodes.find(code => String(code.codeHash || code.hash || "").toLowerCase() === hash) || null;
+            if (!item) {
+              toast("Промокод не найден.", "danger");
+              return;
+            }
+            if (item.revoked || item.deleted) {
+              toast("Промокод отозван.", "danger");
+              return;
+            }
+            if (item.expiresAt && Date.now() > Number(item.expiresAt)) {
+              toast("Срок действия промокода истёк.", "danger");
+              return;
+            }
+          }
+        } finally {
+          hideLoader();
+          dom.activatePromoBtn.disabled = false;
         }
-        if (item.deleted) {
-          toast("Промокод удалён.", "danger");
-          return;
-        }
-        if (item.expiresAt && Date.now() > item.expiresAt) {
-          toast("Срок действия промокода истёк.", "danger");
-          return;
-        }
-        const max = Number(item.maxActivations || 1);
-        const used = Number(item.activations || 0);
-        if (max > 0 && used >= max) {
-          toast("Лимит активаций промокода исчерпан.", "danger");
-          return;
-        }
-        item.activations = used + 1;
-        item.lastActivatedAt = Date.now();
-        writeStore(STORE.promoCodes, codes);
         state.premium = {
           active: true,
-          code: item.code,
-          expiresAt: item.expiresAt || null,
+          code: source === "local" ? item.code : input,
+          expiresAt: item.expiresAt ? Number(item.expiresAt) : null,
           activatedAt: Date.now()
         };
         writeStore(STORE.premium, state.premium);

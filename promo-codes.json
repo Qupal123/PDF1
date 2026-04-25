@@ -1,0 +1,8 @@
+{
+  "app": "PDF Scanner",
+  "type": "public-promo-db",
+  "version": 2,
+  "generatedAt": 0,
+  "note": "Replace this file with export from local admin.html. It contains SHA-256 hashes, not real promo codes.",
+  "codes": []
+}
