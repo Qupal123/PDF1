@@ -2076,6 +2076,8 @@
         for (let i = 0, p = 0; i < data.length; i += 4, p++) {
           gray[p] = data[i] * .299 + data[i + 1] * .587 + data[i + 2] * .114;
         }
+        const surfaceQuad = detectDocumentBySurface(data, gray, width, height, scale);
+        if (surfaceQuad) return surfaceQuad;
         const blurred = boxBlurGray(gray, width, height, 1);
         const mag = new Float32Array(width * height);
         let sum = 0;
@@ -2107,10 +2109,11 @@
           minCountRatio: .006,
           minBoxRatio: .24,
           minAreaRatio: .08,
+          maxAreaRatio: .68,
+          maxMarginHits: 1,
           rejectAlmostFullFrame: true
         });
-        if (edgeQuad) return edgeQuad;
-        return detectDocumentBySurface(gray, width, height, scale);
+        return edgeQuad;
       }
 
       function dilate(mask, width, height, iterations) {
@@ -2162,9 +2165,11 @@
         const quad = orderCorners([component.tl, component.tr, component.br, component.bl]);
         const area = polygonArea(quad);
         if (area < width * height * (options.minAreaRatio ?? .12)) return null;
+        if (area > width * height * (options.maxAreaRatio ?? .82)) return null;
         const marginHits =
           (component.minX < 3 ? 1 : 0) + (component.minY < 3 ? 1 : 0) +
           (component.maxX > width - 4 ? 1 : 0) + (component.maxY > height - 4 ? 1 : 0);
+        if (marginHits > (options.maxMarginHits ?? 2)) return null;
         if (options.rejectAlmostFullFrame && marginHits >= 3 && area > width * height * .9) return null;
         return quad.map(p => ({ x: p.x / scale, y: p.y / scale }));
       }
@@ -2183,9 +2188,35 @@
         return count ? sum / count : 128;
       }
 
-      function detectDocumentBySurface(gray, width, height, scale) {
+      function borderColorMean(data, width, height) {
+        const band = Math.max(4, Math.round(Math.min(width, height) * .055));
+        let r = 0, g = 0, b = 0, count = 0;
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) {
+            if (x > band && x < width - band && y > band && y < height - band) continue;
+            const i = (y * width + x) * 4;
+            r += data[i];
+            g += data[i + 1];
+            b += data[i + 2];
+            count++;
+          }
+        }
+        return count ? { r: r / count, g: g / count, b: b / count } : { r: 128, g: 128, b: 128 };
+      }
+
+      function surfaceScore(component, quad, width, height) {
+        const areaRatio = component.count / (width * height);
+        const cx = (component.minX + component.maxX) / 2 / width;
+        const cy = (component.minY + component.maxY) / 2 / height;
+        const centerPenalty = Math.hypot(cx - .5, cy - .54);
+        const sizePenalty = Math.abs(areaRatio - .22);
+        return areaRatio * 3 - centerPenalty * .5 - sizePenalty * .35;
+      }
+
+      function detectDocumentBySurface(data, gray, width, height, scale) {
         const levels = histogramPercentiles(gray);
         const borderMean = borderLumaMean(gray, width, height);
+        const borderColor = borderColorMean(data, width, height);
         const candidates = [
           {
             type: "bright",
@@ -2198,27 +2229,47 @@
           {
             type: "dark",
             threshold: clamp(Math.min(borderMean - 18, levels.low + 76), 18, 178)
+          },
+          {
+            type: "color",
+            threshold: 34
+          },
+          {
+            type: "color",
+            threshold: 24
           }
         ];
         let best = null;
         for (const candidate of candidates) {
           let mask = new Uint8Array(width * height);
-          for (let i = 0; i < gray.length; i++) {
-            mask[i] = candidate.type === "bright"
-              ? (gray[i] >= candidate.threshold ? 1 : 0)
-              : (gray[i] <= candidate.threshold ? 1 : 0);
+          if (candidate.type === "color") {
+            for (let p = 0, i = 0; p < gray.length; p++, i += 4) {
+              const dr = data[i] - borderColor.r;
+              const dg = data[i + 1] - borderColor.g;
+              const db = data[i + 2] - borderColor.b;
+              const chroma = Math.max(data[i], data[i + 1], data[i + 2]) - Math.min(data[i], data[i + 1], data[i + 2]);
+              mask[p] = Math.hypot(dr, dg, db) + chroma * .35 >= candidate.threshold ? 1 : 0;
+            }
+          } else {
+            for (let i = 0; i < gray.length; i++) {
+              mask[i] = candidate.type === "bright"
+                ? (gray[i] >= candidate.threshold ? 1 : 0)
+                : (gray[i] <= candidate.threshold ? 1 : 0);
+            }
           }
-          mask = dilate(erode(mask, width, height, 1), width, height, 2);
+          mask = erode(dilate(erode(mask, width, height, 1), width, height, 2), width, height, 1);
           const component = largestComponent(mask, width, height);
           const quad = validateDetectedComponent(component, width, height, scale, {
-            minCountRatio: .045,
-            minBoxRatio: .32,
-            minAreaRatio: .13,
-            rejectAlmostFullFrame: false
+            minCountRatio: candidate.type === "color" ? .025 : .045,
+            minBoxRatio: .22,
+            minAreaRatio: .055,
+            maxAreaRatio: .62,
+            maxMarginHits: 1,
+            rejectAlmostFullFrame: true
           });
           if (!quad) continue;
-          const area = polygonArea(quad);
-          if (!best || area > best.area) best = { quad, area };
+          const score = surfaceScore(component, quad, width, height);
+          if (!best || score > best.score) best = { quad, score };
         }
         return best?.quad || null;
       }
