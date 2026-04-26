@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="ru">
 <head>
   <meta charset="utf-8">
@@ -380,6 +380,26 @@
       stroke-width: 2.5;
       filter: drop-shadow(0 4px 10px rgba(0, 0, 0, .42));
       pointer-events: none;
+    }
+
+    .zoom-controls {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: auto;
+    }
+
+    .zoom-controls .secondary {
+      min-width: 42px;
+      padding: 0 12px;
+    }
+
+    .zoom-controls output {
+      min-width: 54px;
+      text-align: center;
+      color: var(--muted);
+      font-weight: 760;
+      font-size: 13px;
     }
 
     .controls {
@@ -797,15 +817,15 @@
           <div class="brand-mark"></div>
           <div class="brand-text">
             <div class="brand-title">PDF Scanner</div>
-            <div class="brand-subtitle">сканирование документов</div>
+            <div class="brand-subtitle">СЃРєР°РЅРёСЂРѕРІР°РЅРёРµ РґРѕРєСѓРјРµРЅС‚РѕРІ</div>
           </div>
         </div>
         <div class="topbar-spacer"></div>
         <button class="pill" id="premiumBtn" type="button" title="Premium">
           <span id="premiumBadge">Free</span>
         </button>
-        <div class="pill" title="Страницы"><strong id="pageCount">0</strong><span>/ 25</span></div>
-        <button class="icon-button" id="themeBtn" type="button" title="Тема" aria-label="Переключить тему">
+        <div class="pill" title="РЎС‚СЂР°РЅРёС†С‹"><strong id="pageCount">0</strong><span>/ 25</span></div>
+        <button class="icon-button" id="themeBtn" type="button" title="РўРµРјР°" aria-label="РџРµСЂРµРєР»СЋС‡РёС‚СЊ С‚РµРјСѓ">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path d="M12 3v2.2M12 18.8V21M4.2 4.2l1.6 1.6M18.2 18.2l1.6 1.6M3 12h2.2M18.8 12H21M4.2 19.8l1.6-1.6M18.2 5.8l1.6-1.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
             <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8"/>
@@ -816,31 +836,31 @@
       <div class="camera-state" id="cameraState">
         <div class="state-box">
           <div class="spinner" style="margin:0 auto 12px"></div>
-          <h2 id="cameraStateTitle">Запуск камеры</h2>
-          <p id="cameraStateText">Разрешите доступ к камере. Если камера недоступна, можно загрузить изображения через галерею или перетащить файлы.</p>
+          <h2 id="cameraStateTitle">Р—Р°РїСѓСЃРє РєР°РјРµСЂС‹</h2>
+          <p id="cameraStateText">Р Р°Р·СЂРµС€РёС‚Рµ РґРѕСЃС‚СѓРї Рє РєР°РјРµСЂРµ. Р•СЃР»Рё РєР°РјРµСЂР° РЅРµРґРѕСЃС‚СѓРїРЅР°, РјРѕР¶РЅРѕ Р·Р°РіСЂСѓР·РёС‚СЊ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ С‡РµСЂРµР· РіР°Р»РµСЂРµСЋ РёР»Рё РїРµСЂРµС‚Р°С‰РёС‚СЊ С„Р°Р№Р»С‹.</p>
           <div class="state-actions">
-            <button class="secondary" id="retryCameraBtn" type="button">Повторить</button>
-            <button class="secondary" id="iosCaptureBtn" type="button">Выбрать/снять фото</button>
-            <button class="primary" id="stateUploadBtn" type="button">Выбрать изображения</button>
+            <button class="secondary" id="retryCameraBtn" type="button">РџРѕРІС‚РѕСЂРёС‚СЊ</button>
+            <button class="secondary" id="iosCaptureBtn" type="button">Р’С‹Р±СЂР°С‚СЊ/СЃРЅСЏС‚СЊ С„РѕС‚Рѕ</button>
+            <button class="primary" id="stateUploadBtn" type="button">Р’С‹Р±СЂР°С‚СЊ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ</button>
           </div>
         </div>
       </div>
 
       <div class="capture-row">
-        <button class="quick-button" id="uploadBtn" type="button" title="Галерея">
+        <button class="quick-button" id="uploadBtn" type="button" title="Р“Р°Р»РµСЂРµСЏ">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v13a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 18.5v-13Z" stroke="currentColor" stroke-width="1.8"/>
             <path d="m5 17 4.5-4.5 3.3 3.3 2-2L20 19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
             <circle cx="15.5" cy="8" r="1.5" fill="currentColor"/>
           </svg>
-          <span>Галерея</span>
+          <span>Р“Р°Р»РµСЂРµСЏ</span>
         </button>
-        <button class="capture" id="captureBtn" type="button" aria-label="Сделать снимок"></button>
-        <button class="quick-button" id="nextScanBtn" type="button" title="Следующий скан">
+        <button class="capture" id="captureBtn" type="button" aria-label="РЎРґРµР»Р°С‚СЊ СЃРЅРёРјРѕРє"></button>
+        <button class="quick-button" id="nextScanBtn" type="button" title="РЎР»РµРґСѓСЋС‰РёР№ СЃРєР°РЅ">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-          <span>Следующий</span>
+          <span>РЎР»РµРґСѓСЋС‰РёР№</span>
         </button>
       </div>
     </section>
@@ -848,10 +868,16 @@
     <main class="workspace">
       <section class="section editor-section" id="editorSection">
         <div class="section-header">
-          <div class="section-title">Редактор</div>
-          <button class="secondary" id="cornerModeBtn" type="button">Углы</button>
-          <button class="secondary" id="applyCornersBtn" type="button">Применить углы</button>
-          <button class="secondary" id="rotateCurrentBtn" type="button">Повернуть</button>
+          <div class="section-title">Р РµРґР°РєС‚РѕСЂ</div>
+          <button class="secondary" id="cornerModeBtn" type="button">РЈРіР»С‹</button>
+          <button class="secondary" id="applyCornersBtn" type="button">РџСЂРёРјРµРЅРёС‚СЊ СѓРіР»С‹</button>
+          <button class="secondary" id="rotateCurrentBtn" type="button">РџРѕРІРµСЂРЅСѓС‚СЊ</button>
+          <div class="zoom-controls" aria-label="Масштаб редактора">
+            <button class="secondary" id="zoomOutBtn" type="button" title="Отдалить">-</button>
+            <output id="zoomValue">100%</output>
+            <button class="secondary" id="zoomInBtn" type="button" title="Приблизить">+</button>
+            <button class="secondary" id="zoomResetBtn" type="button" title="Сбросить масштаб">100%</button>
+          </div>
         </div>
         <div class="editor-stage empty" id="editorStage">
           <canvas id="editorCanvas"></canvas>
@@ -860,29 +886,29 @@
             <polygon id="cornerPolygon" points=""></polygon>
             <g id="cornerHandles"></g>
           </svg>
-          <div id="editorEmpty">Сделайте снимок или загрузите изображение. Страница появится здесь для проверки углов и обработки.</div>
+          <div id="editorEmpty">РЎРґРµР»Р°Р№С‚Рµ СЃРЅРёРјРѕРє РёР»Рё Р·Р°РіСЂСѓР·РёС‚Рµ РёР·РѕР±СЂР°Р¶РµРЅРёРµ. РЎС‚СЂР°РЅРёС†Р° РїРѕСЏРІРёС‚СЃСЏ Р·РґРµСЃСЊ РґР»СЏ РїСЂРѕРІРµСЂРєРё СѓРіР»РѕРІ Рё РѕР±СЂР°Р±РѕС‚РєРё.</div>
         </div>
         <div class="controls">
           <div class="segment" id="filterSegment">
-            <button type="button" data-filter="original">Оригинал</button>
-            <button type="button" data-filter="color">Цветной</button>
+            <button type="button" data-filter="original">РћСЂРёРіРёРЅР°Р»</button>
+            <button type="button" data-filter="color">Р¦РІРµС‚РЅРѕР№</button>
             <button type="button" data-filter="gray">Grayscale</button>
-            <button type="button" data-filter="bw">Ч/Б документ</button>
-            <button type="button" data-filter="super">Суперскан</button>
+            <button type="button" data-filter="bw">Р§/Р‘ РґРѕРєСѓРјРµРЅС‚</button>
+            <button type="button" data-filter="super">РЎСѓРїРµСЂСЃРєР°РЅ</button>
           </div>
           <div class="sliders" id="sliders"></div>
           <div class="actions">
-            <button class="primary" id="applyAllBtn" type="button">Применить ко всем</button>
-            <button class="secondary" id="resetSettingsBtn" type="button">Сбросить настройки</button>
-            <button class="secondary" id="saveStateBtn" type="button">Сохранить</button>
+            <button class="primary" id="applyAllBtn" type="button">РџСЂРёРјРµРЅРёС‚СЊ РєРѕ РІСЃРµРј</button>
+            <button class="secondary" id="resetSettingsBtn" type="button">РЎР±СЂРѕСЃРёС‚СЊ РЅР°СЃС‚СЂРѕР№РєРё</button>
+            <button class="secondary" id="saveStateBtn" type="button">РЎРѕС…СЂР°РЅРёС‚СЊ</button>
           </div>
         </div>
       </section>
 
       <section class="section" id="gallerySection">
         <div class="section-header">
-          <div class="section-title">Страницы</div>
-          <button class="secondary desktop-only" id="clearPagesBtn" type="button">Очистить</button>
+          <div class="section-title">РЎС‚СЂР°РЅРёС†С‹</div>
+          <button class="secondary desktop-only" id="clearPagesBtn" type="button">РћС‡РёСЃС‚РёС‚СЊ</button>
         </div>
         <div class="grid" id="pagesGrid"></div>
       </section>
@@ -895,29 +921,29 @@
           <div class="pdf-row">
             <div>
               <strong>A4 PDF</strong><br>
-              <span id="pdfQualityText">Free: стандартное качество</span>
+              <span id="pdfQualityText">Free: СЃС‚Р°РЅРґР°СЂС‚РЅРѕРµ РєР°С‡РµСЃС‚РІРѕ</span>
             </div>
-            <button class="primary" id="downloadPdfBtn" type="button">Скачать PDF</button>
+            <button class="primary" id="downloadPdfBtn" type="button">РЎРєР°С‡Р°С‚СЊ PDF</button>
           </div>
           <div class="pdf-row">
             <div>
               <strong>Premium</strong><br>
-              <span>Цветной Суперскан, 25 страниц, все фильтры, 4K-превью и PDF до 8K</span>
+              <span>Р¦РІРµС‚РЅРѕР№ РЎСѓРїРµСЂСЃРєР°РЅ, 25 СЃС‚СЂР°РЅРёС†, РІСЃРµ С„РёР»СЊС‚СЂС‹, 4K-РїСЂРµРІСЊСЋ Рё PDF РґРѕ 8K</span>
             </div>
-            <button class="secondary" id="openPremiumBtn" type="button">Открыть</button>
+            <button class="secondary" id="openPremiumBtn" type="button">РћС‚РєСЂС‹С‚СЊ</button>
           </div>
         </div>
       </section>
     </main>
 
-    <nav class="bottom-nav" aria-label="Навигация">
+    <nav class="bottom-nav" aria-label="РќР°РІРёРіР°С†РёСЏ">
       <button type="button" data-jump="cameraSection" class="active">
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 8.5A2.5 2.5 0 0 1 6.5 6H8l1.3-2h5.4L16 6h1.5A2.5 2.5 0 0 1 20 8.5v8A2.5 2.5 0 0 1 17.5 19h-11A2.5 2.5 0 0 1 4 16.5v-8Z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12.5" r="3.4" stroke="currentColor" stroke-width="1.8"/></svg>
-        Камера
+        РљР°РјРµСЂР°
       </button>
       <button type="button" data-jump="gallerySection">
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 7h12v13H8zM4 4h12v3M4 4v13h4" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
-        Галерея
+        Р“Р°Р»РµСЂРµСЏ
       </button>
       <button type="button" data-jump="pdfSection">
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 3h7l4 4v14H7z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M14 3v5h5M9.5 14h5M9.5 17h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
@@ -932,8 +958,8 @@
   <div class="drop-catcher" id="dropCatcher">
     <div class="drop-card">
       <div>
-        <h2>Отпустите изображения</h2>
-        <p>Поддерживаются JPG, PNG, WEBP и BMP. Документы будут найдены и добавлены в очередь сканирования.</p>
+        <h2>РћС‚РїСѓСЃС‚РёС‚Рµ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ</h2>
+        <p>РџРѕРґРґРµСЂР¶РёРІР°СЋС‚СЃСЏ JPG, PNG, WEBP Рё BMP. Р”РѕРєСѓРјРµРЅС‚С‹ Р±СѓРґСѓС‚ РЅР°Р№РґРµРЅС‹ Рё РґРѕР±Р°РІР»РµРЅС‹ РІ РѕС‡РµСЂРµРґСЊ СЃРєР°РЅРёСЂРѕРІР°РЅРёСЏ.</p>
       </div>
     </div>
   </div>
@@ -941,32 +967,32 @@
   <div class="modal-backdrop" id="premiumModal" role="dialog" aria-modal="true" aria-labelledby="premiumTitle">
     <div class="modal">
       <div class="modal-header">
-        <h2 id="premiumTitle">Premium доступ</h2>
-        <button class="icon-button" type="button" data-close-modal="premiumModal" aria-label="Закрыть">
+        <h2 id="premiumTitle">Premium РґРѕСЃС‚СѓРї</h2>
+        <button class="icon-button" type="button" data-close-modal="premiumModal" aria-label="Р—Р°РєСЂС‹С‚СЊ">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
         </button>
       </div>
       <div class="modal-body">
         <div class="notice">
-          <strong>Оплата вручную.</strong><br>
-          Переведите оплату на карту, затем отправьте скрин оплаты на email. После проверки вы получите промокод.
+          <strong>РћРїР»Р°С‚Р° РІСЂСѓС‡РЅСѓСЋ.</strong><br>
+          РџРµСЂРµРІРµРґРёС‚Рµ РѕРїР»Р°С‚Сѓ РЅР° РєР°СЂС‚Сѓ, Р·Р°С‚РµРј РѕС‚РїСЂР°РІСЊС‚Рµ СЃРєСЂРёРЅ РѕРїР»Р°С‚С‹ РЅР° email. РџРѕСЃР»Рµ РїСЂРѕРІРµСЂРєРё РІС‹ РїРѕР»СѓС‡РёС‚Рµ РїСЂРѕРјРѕРєРѕРґ.
         </div>
         <div class="copy-row">
           <div>
-            <div class="soft-label">Карта</div>
+            <div class="soft-label">РљР°СЂС‚Р°</div>
             <div class="copy-value" id="cardNumber">2200 1546 4888 2743</div>
           </div>
-          <button class="secondary" id="copyCardBtn" type="button">Скопировать карту</button>
+          <button class="secondary" id="copyCardBtn" type="button">РЎРєРѕРїРёСЂРѕРІР°С‚СЊ РєР°СЂС‚Сѓ</button>
         </div>
         <div class="copy-row">
           <div>
             <div class="soft-label">Email</div>
             <div class="copy-value" id="supportEmail">supportpays@icloud.com</div>
           </div>
-          <button class="secondary" id="copyEmailBtn" type="button">Скопировать email</button>
+          <button class="secondary" id="copyEmailBtn" type="button">РЎРєРѕРїРёСЂРѕРІР°С‚СЊ email</button>
         </div>
-        <div class="notice" id="premiumStatusText">Free режим: 5 страниц, стандартный PDF, базовые фильтры.</div>
-        <button class="primary" id="havePromoBtn" type="button">У меня есть промокод</button>
+        <div class="notice" id="premiumStatusText">Free СЂРµР¶РёРј: 5 СЃС‚СЂР°РЅРёС†, СЃС‚Р°РЅРґР°СЂС‚РЅС‹Р№ PDF, Р±Р°Р·РѕРІС‹Рµ С„РёР»СЊС‚СЂС‹.</div>
+        <button class="primary" id="havePromoBtn" type="button">РЈ РјРµРЅСЏ РµСЃС‚СЊ РїСЂРѕРјРѕРєРѕРґ</button>
       </div>
     </div>
   </div>
@@ -974,15 +1000,15 @@
   <div class="modal-backdrop" id="promoModal" role="dialog" aria-modal="true" aria-labelledby="promoTitle">
     <div class="modal">
       <div class="modal-header">
-        <h2 id="promoTitle">Активация промокода</h2>
-        <button class="icon-button" type="button" data-close-modal="promoModal" aria-label="Закрыть">
+        <h2 id="promoTitle">РђРєС‚РёРІР°С†РёСЏ РїСЂРѕРјРѕРєРѕРґР°</h2>
+        <button class="icon-button" type="button" data-close-modal="promoModal" aria-label="Р—Р°РєСЂС‹С‚СЊ">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
         </button>
       </div>
       <div class="modal-body">
         <div class="input-row">
           <input class="text-input" id="promoInput" type="text" inputmode="latin" autocomplete="one-time-code" placeholder="PDF-XXXX-XXXX-XXXX">
-          <button class="primary" id="activatePromoBtn" type="button">Активировать</button>
+          <button class="primary" id="activatePromoBtn" type="button">РђРєС‚РёРІРёСЂРѕРІР°С‚СЊ</button>
         </div>
       </div>
     </div>
@@ -991,16 +1017,16 @@
   <div class="modal-backdrop" id="pdfReadyModal" role="dialog" aria-modal="true" aria-labelledby="pdfReadyTitle">
     <div class="modal">
       <div class="modal-header">
-        <h2 id="pdfReadyTitle">PDF готов</h2>
-        <button class="icon-button" type="button" data-close-modal="pdfReadyModal" aria-label="Закрыть">
+        <h2 id="pdfReadyTitle">PDF РіРѕС‚РѕРІ</h2>
+        <button class="icon-button" type="button" data-close-modal="pdfReadyModal" aria-label="Р—Р°РєСЂС‹С‚СЊ">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
         </button>
       </div>
       <div class="modal-body">
-        <div class="notice">На iPhone откройте PDF и сохраните его через меню «Поделиться» → «Сохранить в Файлы».</div>
+        <div class="notice">РќР° iPhone РѕС‚РєСЂРѕР№С‚Рµ PDF Рё СЃРѕС…СЂР°РЅРёС‚Рµ РµРіРѕ С‡РµСЂРµР· РјРµРЅСЋ В«РџРѕРґРµР»РёС‚СЊСЃСЏВ» в†’ В«РЎРѕС…СЂР°РЅРёС‚СЊ РІ Р¤Р°Р№Р»С‹В».</div>
         <div class="actions">
-          <a class="primary" id="pdfOpenLink" href="#" target="_blank" rel="noopener">Открыть PDF</a>
-          <button class="secondary" id="pdfShareBtn" type="button">Поделиться</button>
+          <a class="primary" id="pdfOpenLink" href="#" target="_blank" rel="noopener">РћС‚РєСЂС‹С‚СЊ PDF</a>
+          <button class="secondary" id="pdfShareBtn" type="button">РџРѕРґРµР»РёС‚СЊСЃСЏ</button>
         </div>
       </div>
     </div>
@@ -1009,7 +1035,7 @@
   <div class="loader" id="loader">
     <div class="loader-card">
       <div class="spinner"></div>
-      <div id="loaderText">Обработка</div>
+      <div id="loaderText">РћР±СЂР°Р±РѕС‚РєР°</div>
     </div>
   </div>
   <div class="toasts" id="toasts"></div>
@@ -1052,13 +1078,13 @@
       };
 
       const SLIDER_META = [
-        ["brightness", "Яркость", -60, 70, 1],
-        ["contrast", "Контраст", -60, 90, 1],
-        ["sharpness", "Резкость", 0, 100, 1],
+        ["brightness", "РЇСЂРєРѕСЃС‚СЊ", -60, 70, 1],
+        ["contrast", "РљРѕРЅС‚СЂР°СЃС‚", -60, 90, 1],
+        ["sharpness", "Р РµР·РєРѕСЃС‚СЊ", 0, 100, 1],
         ["threshold", "Threshold", -60, 60, 1],
-        ["saturation", "Насыщенность", -80, 80, 1],
-        ["temperature", "Температура", -70, 70, 1],
-        ["shadows", "Удаление теней", 0, 100, 1]
+        ["saturation", "РќР°СЃС‹С‰РµРЅРЅРѕСЃС‚СЊ", -80, 80, 1],
+        ["temperature", "РўРµРјРїРµСЂР°С‚СѓСЂР°", -70, 70, 1],
+        ["shadows", "РЈРґР°Р»РµРЅРёРµ С‚РµРЅРµР№", 0, 100, 1]
       ];
 
       const dom = {
@@ -1108,6 +1134,10 @@
         cornerModeBtn: document.getElementById("cornerModeBtn"),
         applyCornersBtn: document.getElementById("applyCornersBtn"),
         rotateCurrentBtn: document.getElementById("rotateCurrentBtn"),
+        zoomOutBtn: document.getElementById("zoomOutBtn"),
+        zoomInBtn: document.getElementById("zoomInBtn"),
+        zoomResetBtn: document.getElementById("zoomResetBtn"),
+        zoomValue: document.getElementById("zoomValue"),
         filterSegment: document.getElementById("filterSegment"),
         sliders: document.getElementById("sliders"),
         applyAllBtn: document.getElementById("applyAllBtn"),
@@ -1133,6 +1163,11 @@
         liveLoop: 0,
         cropMode: false,
         editorFit: null,
+        editorZoom: 1,
+        editorPanX: 0,
+        editorPanY: 0,
+        panningEditor: false,
+        panStart: null,
         draggingCorner: null,
         dragPageId: null,
         settings: {
@@ -1292,7 +1327,7 @@
         }, 3200);
       }
 
-      function showLoader(text = "Обработка") {
+      function showLoader(text = "РћР±СЂР°Р±РѕС‚РєР°") {
         dom.loaderText.textContent = text;
         dom.loader.classList.add("show");
       }
@@ -1510,14 +1545,14 @@
         return new Promise((resolve, reject) => {
           const image = new Image();
           image.onload = () => resolve(image);
-          image.onerror = () => reject(new Error("Не удалось прочитать изображение"));
+          image.onerror = () => reject(new Error("РќРµ СѓРґР°Р»РѕСЃСЊ РїСЂРѕС‡РёС‚Р°С‚СЊ РёР·РѕР±СЂР°Р¶РµРЅРёРµ"));
           image.src = src;
         });
       }
 
       async function fileToCanvas(file) {
         if (!/^image\//i.test(file.type)) {
-          throw new Error(`Файл ${file.name || ""} не является поддерживаемым изображением`);
+          throw new Error(`Р¤Р°Р№Р» ${file.name || ""} РЅРµ СЏРІР»СЏРµС‚СЃСЏ РїРѕРґРґРµСЂР¶РёРІР°РµРјС‹Рј РёР·РѕР±СЂР°Р¶РµРЅРёРµРј`);
         }
         if ("createImageBitmap" in window) {
           try {
@@ -1533,7 +1568,7 @@
         const dataUrl = await new Promise((resolve, reject) => {
           const reader = new FileReader();
           reader.onload = () => resolve(reader.result);
-          reader.onerror = () => reject(new Error("Не удалось прочитать файл"));
+          reader.onerror = () => reject(new Error("РќРµ СѓРґР°Р»РѕСЃСЊ РїСЂРѕС‡РёС‚Р°С‚СЊ С„Р°Р№Р»"));
           reader.readAsDataURL(file);
         });
         return canvasFromImage(await loadImage(dataUrl));
@@ -2320,7 +2355,7 @@
 
       async function renderPageCanvas(page, context = "preview") {
         if (!page.originalDataUrl) await hydratePageImages(page);
-        if (!page.originalDataUrl) throw new Error("Не найден оригинал страницы");
+        if (!page.originalDataUrl) throw new Error("РќРµ РЅР°Р№РґРµРЅ РѕСЂРёРіРёРЅР°Р» СЃС‚СЂР°РЅРёС†С‹");
         const image = await loadImage(page.originalDataUrl);
         const source = canvasFromImage(image);
         const mode = ensureFilterAllowed(page.filter || state.settings.filter);
@@ -2370,12 +2405,12 @@
 
       function canAddPage(showMessage = true) {
         if (state.pages.length >= MAX_PAGES) {
-          if (showMessage) toast("Достигнут максимум: 25 страниц.", "warn");
+          if (showMessage) toast("Р”РѕСЃС‚РёРіРЅСѓС‚ РјР°РєСЃРёРјСѓРј: 25 СЃС‚СЂР°РЅРёС†.", "warn");
           return false;
         }
         if (state.pages.length >= FREE_LIMIT && !isPremium()) {
           if (showMessage) {
-            toast("В Free режиме доступно 5 страниц. Для 25 страниц нужен Premium.", "warn");
+            toast("Р’ Free СЂРµР¶РёРјРµ РґРѕСЃС‚СѓРїРЅРѕ 5 СЃС‚СЂР°РЅРёС†. Р”Р»СЏ 25 СЃС‚СЂР°РЅРёС† РЅСѓР¶РµРЅ Premium.", "warn");
             openModal("premiumModal");
           }
           return false;
@@ -2383,9 +2418,9 @@
         return true;
       }
 
-      async function addPageFromCanvas(sourceCanvas, sourceLabel = "Скан") {
+      async function addPageFromCanvas(sourceCanvas, sourceLabel = "РЎРєР°РЅ") {
         if (!canAddPage()) return;
-        showLoader("Поиск документа");
+        showLoader("РџРѕРёСЃРє РґРѕРєСѓРјРµРЅС‚Р°");
         await nextFrame();
         const normalized = resizeCanvas(sourceCanvas, isPremium() ? ORIGINAL_PREMIUM_MAX_SIDE : ORIGINAL_FREE_MAX_SIDE);
         const corners = detectDocument(normalized);
@@ -2402,22 +2437,23 @@
           rotation: 0,
           detection: corners ? "auto" : "manual"
         };
-        showLoader(corners ? "Выравнивание перспективы" : "Ручной режим");
+        showLoader(corners ? "Р’С‹СЂР°РІРЅРёРІР°РЅРёРµ РїРµСЂСЃРїРµРєС‚РёРІС‹" : "Р СѓС‡РЅРѕР№ СЂРµР¶РёРј");
         await processPage(page, { skipPersist: true });
         state.pages.push(page);
           state.currentId = page.id;
           state.settings.filter = "original";
+          resetEditorZoom();
           if (!corners) {
           state.cropMode = true;
-          toast("Контур не найден. Проверьте углы вручную.", "warn");
+          toast("РљРѕРЅС‚СѓСЂ РЅРµ РЅР°Р№РґРµРЅ. РџСЂРѕРІРµСЂСЊС‚Рµ СѓРіР»С‹ РІСЂСѓС‡РЅСѓСЋ.", "warn");
         } else {
           state.cropMode = true;
-          toast("Страница добавлена.", "ok");
+          toast("РЎС‚СЂР°РЅРёС†Р° РґРѕР±Р°РІР»РµРЅР°.", "ok");
         }
         persistPages();
         renderAll();
         state.cropMode = true;
-        dom.cornerModeBtn.textContent = "Просмотр";
+        dom.cornerModeBtn.textContent = "РџСЂРѕСЃРјРѕС‚СЂ";
         hideLoader();
       }
 
@@ -2425,10 +2461,10 @@
         if (state.processing) return;
         if (!state.cameraReady || !dom.video.videoWidth) {
           if (state.cameraFallback) {
-            toast("Live-камера недоступна. Нажмите «Выбрать/снять фото».", "warn");
+            toast("Live-РєР°РјРµСЂР° РЅРµРґРѕСЃС‚СѓРїРЅР°. РќР°Р¶РјРёС‚Рµ В«Р’С‹Р±СЂР°С‚СЊ/СЃРЅСЏС‚СЊ С„РѕС‚РѕВ».", "warn");
             return;
           }
-          toast("Камера ещё не готова. Можно загрузить изображение из галереи.", "warn");
+          toast("РљР°РјРµСЂР° РµС‰С‘ РЅРµ РіРѕС‚РѕРІР°. РњРѕР¶РЅРѕ Р·Р°РіСЂСѓР·РёС‚СЊ РёР·РѕР±СЂР°Р¶РµРЅРёРµ РёР· РіР°Р»РµСЂРµРё.", "warn");
           return;
         }
         if (!canAddPage()) return;
@@ -2440,10 +2476,10 @@
         try {
           const canvas = createCanvas(dom.video.videoWidth, dom.video.videoHeight);
           canvas.getContext("2d", { willReadFrequently: true }).drawImage(dom.video, 0, 0);
-          await addPageFromCanvas(canvas, "Камера");
+          await addPageFromCanvas(canvas, "РљР°РјРµСЂР°");
         } catch (error) {
           console.error(error);
-          toast(error.message || "Не удалось сделать снимок", "danger");
+          toast(error.message || "РќРµ СѓРґР°Р»РѕСЃСЊ СЃРґРµР»Р°С‚СЊ СЃРЅРёРјРѕРє", "danger");
         } finally {
           state.processing = false;
           dom.captureBtn.disabled = false;
@@ -2459,19 +2495,19 @@
           if (!canAddPage()) break;
           state.processing = true;
           try {
-            showLoader(`Загрузка: ${file.name || "изображение"}`);
+            showLoader(`Р—Р°РіСЂСѓР·РєР°: ${file.name || "РёР·РѕР±СЂР°Р¶РµРЅРёРµ"}`);
             const canvas = await fileToCanvas(file);
-            await addPageFromCanvas(canvas, file.name || "Изображение");
+            await addPageFromCanvas(canvas, file.name || "РР·РѕР±СЂР°Р¶РµРЅРёРµ");
             added++;
           } catch (error) {
             console.error(error);
-            toast(error.message || "Не удалось загрузить файл", "danger");
+            toast(error.message || "РќРµ СѓРґР°Р»РѕСЃСЊ Р·Р°РіСЂСѓР·РёС‚СЊ С„Р°Р№Р»", "danger");
           } finally {
             state.processing = false;
             hideLoader();
           }
         }
-        if (added > 1) toast(`Добавлено страниц: ${added}`, "ok");
+        if (added > 1) toast(`Р”РѕР±Р°РІР»РµРЅРѕ СЃС‚СЂР°РЅРёС†: ${added}`, "ok");
       }
 
       async function startCamera() {
@@ -2480,13 +2516,13 @@
         state.cameraFallback = false;
         dom.captureBtn.disabled = true;
         dom.cameraState.classList.remove("hidden");
-        dom.cameraStateTitle.textContent = "Запуск камеры";
-        dom.cameraStateText.textContent = "Разрешите доступ к камере. Если камера недоступна, можно загрузить изображения через галерею или перетащить файлы.";
+        dom.cameraStateTitle.textContent = "Р—Р°РїСѓСЃРє РєР°РјРµСЂС‹";
+        dom.cameraStateText.textContent = "Р Р°Р·СЂРµС€РёС‚Рµ РґРѕСЃС‚СѓРї Рє РєР°РјРµСЂРµ. Р•СЃР»Рё РєР°РјРµСЂР° РЅРµРґРѕСЃС‚СѓРїРЅР°, РјРѕР¶РЅРѕ Р·Р°РіСЂСѓР·РёС‚СЊ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ С‡РµСЂРµР· РіР°Р»РµСЂРµСЋ РёР»Рё РїРµСЂРµС‚Р°С‰РёС‚СЊ С„Р°Р№Р»С‹.";
         try {
           if (needsHttpsForCamera()) {
-            throw new Error("Для камеры на iPhone и других мобильных браузерах нужен HTTPS. По http://192.168.x.x камера блокируется браузером.");
+            throw new Error("Р”Р»СЏ РєР°РјРµСЂС‹ РЅР° iPhone Рё РґСЂСѓРіРёС… РјРѕР±РёР»СЊРЅС‹С… Р±СЂР°СѓР·РµСЂР°С… РЅСѓР¶РµРЅ HTTPS. РџРѕ http://192.168.x.x РєР°РјРµСЂР° Р±Р»РѕРєРёСЂСѓРµС‚СЃСЏ Р±СЂР°СѓР·РµСЂРѕРј.");
           }
-          if (!navigator.mediaDevices?.getUserMedia) throw new Error("Браузер не поддерживает доступ к камере");
+          if (!navigator.mediaDevices?.getUserMedia) throw new Error("Р‘СЂР°СѓР·РµСЂ РЅРµ РїРѕРґРґРµСЂР¶РёРІР°РµС‚ РґРѕСЃС‚СѓРї Рє РєР°РјРµСЂРµ");
           const constraintList = [
             {
               audio: false,
@@ -2517,7 +2553,7 @@
               lastError = error;
             }
           }
-          if (!stream) throw lastError || new Error("Камера не открылась");
+          if (!stream) throw lastError || new Error("РљР°РјРµСЂР° РЅРµ РѕС‚РєСЂС‹Р»Р°СЃСЊ");
           state.stream = stream;
           dom.video.srcObject = stream;
           await dom.video.play();
@@ -2531,11 +2567,11 @@
           state.cameraFallback = true;
           dom.captureBtn.disabled = false;
           dom.cameraState.classList.remove("hidden");
-          dom.cameraStateTitle.textContent = "Камера недоступна";
+          dom.cameraStateTitle.textContent = "РљР°РјРµСЂР° РЅРµРґРѕСЃС‚СѓРїРЅР°";
           dom.cameraStateText.textContent = needsHttpsForCamera()
-            ? "Вы открыли приложение по обычному HTTP. На iPhone live-камера работает только через HTTPS. Нажмите «Выбрать/снять фото» либо запустите локальный HTTPS-сервер."
-            : "Проверьте разрешение браузера. Можно выбрать/снять фото системным окном или загрузить изображение вручную.";
-          toast(error.message || "Камера недоступна. Загрузка изображений остаётся доступной.", "warn");
+            ? "Р’С‹ РѕС‚РєСЂС‹Р»Рё РїСЂРёР»РѕР¶РµРЅРёРµ РїРѕ РѕР±С‹С‡РЅРѕРјСѓ HTTP. РќР° iPhone live-РєР°РјРµСЂР° СЂР°Р±РѕС‚Р°РµС‚ С‚РѕР»СЊРєРѕ С‡РµСЂРµР· HTTPS. РќР°Р¶РјРёС‚Рµ В«Р’С‹Р±СЂР°С‚СЊ/СЃРЅСЏС‚СЊ С„РѕС‚РѕВ» Р»РёР±Рѕ Р·Р°РїСѓСЃС‚РёС‚Рµ Р»РѕРєР°Р»СЊРЅС‹Р№ HTTPS-СЃРµСЂРІРµСЂ."
+            : "РџСЂРѕРІРµСЂСЊС‚Рµ СЂР°Р·СЂРµС€РµРЅРёРµ Р±СЂР°СѓР·РµСЂР°. РњРѕР¶РЅРѕ РІС‹Р±СЂР°С‚СЊ/СЃРЅСЏС‚СЊ С„РѕС‚Рѕ СЃРёСЃС‚РµРјРЅС‹Рј РѕРєРЅРѕРј РёР»Рё Р·Р°РіСЂСѓР·РёС‚СЊ РёР·РѕР±СЂР°Р¶РµРЅРёРµ РІСЂСѓС‡РЅСѓСЋ.";
+          toast(error.message || "РљР°РјРµСЂР° РЅРµРґРѕСЃС‚СѓРїРЅР°. Р—Р°РіСЂСѓР·РєР° РёР·РѕР±СЂР°Р¶РµРЅРёР№ РѕСЃС‚Р°С‘С‚СЃСЏ РґРѕСЃС‚СѓРїРЅРѕР№.", "warn");
         }
       }
 
@@ -2601,10 +2637,10 @@
         dom.premiumBadge.textContent = premium ? "Premium" : "Free";
         dom.premiumBtn.classList.toggle("ok", premium);
         dom.premiumBtn.classList.toggle("warn", !premium);
-        dom.pdfQualityText.textContent = premium ? "Premium: цветной SuperScan до 8K в PDF, минимальное сжатие" : "Free: стандартное качество";
+        dom.pdfQualityText.textContent = premium ? "Premium: С†РІРµС‚РЅРѕР№ SuperScan РґРѕ 8K РІ PDF, РјРёРЅРёРјР°Р»СЊРЅРѕРµ СЃР¶Р°С‚РёРµ" : "Free: СЃС‚Р°РЅРґР°СЂС‚РЅРѕРµ РєР°С‡РµСЃС‚РІРѕ";
         dom.premiumStatusText.textContent = premium
-          ? `Premium активен${state.premium.expiresAt ? ` до ${new Date(state.premium.expiresAt).toLocaleDateString("ru-RU")}` : " навсегда"}.`
-          : "Free режим: 5 страниц, стандартный PDF, базовые фильтры.";
+          ? `Premium Р°РєС‚РёРІРµРЅ${state.premium.expiresAt ? ` РґРѕ ${new Date(state.premium.expiresAt).toLocaleDateString("ru-RU")}` : " РЅР°РІСЃРµРіРґР°"}.`
+          : "Free СЂРµР¶РёРј: 5 СЃС‚СЂР°РЅРёС†, СЃС‚Р°РЅРґР°СЂС‚РЅС‹Р№ PDF, Р±Р°Р·РѕРІС‹Рµ С„РёР»СЊС‚СЂС‹.";
       }
 
       function renderFilters() {
@@ -2613,7 +2649,7 @@
           const locked = PREMIUM_FILTERS.has(filter) && !isPremium();
           button.classList.toggle("active", state.settings.filter === filter);
           button.classList.toggle("locked", locked);
-          button.title = locked ? "Доступно в Premium" : "";
+          button.title = locked ? "Р”РѕСЃС‚СѓРїРЅРѕ РІ Premium" : "";
         });
       }
 
@@ -2641,7 +2677,7 @@
         if (!state.pages.length) {
           const empty = document.createElement("div");
           empty.className = "empty-grid";
-          empty.textContent = "Пока нет страниц. Снимите документ камерой или перетащите изображения в окно.";
+          empty.textContent = "РџРѕРєР° РЅРµС‚ СЃС‚СЂР°РЅРёС†. РЎРЅРёРјРёС‚Рµ РґРѕРєСѓРјРµРЅС‚ РєР°РјРµСЂРѕР№ РёР»Рё РїРµСЂРµС‚Р°С‰РёС‚Рµ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ РІ РѕРєРЅРѕ.";
           dom.pagesGrid.appendChild(empty);
           return;
         }
@@ -2651,14 +2687,14 @@
           card.draggable = true;
           card.dataset.id = page.id;
           card.innerHTML = `
-            <div class="thumb-wrap"><img loading="lazy" src="${page.thumbDataUrl || page.processedDataUrl}" alt="Страница ${index + 1}"></div>
+            <div class="thumb-wrap"><img loading="lazy" src="${page.thumbDataUrl || page.processedDataUrl}" alt="РЎС‚СЂР°РЅРёС†Р° ${index + 1}"></div>
             <div class="page-meta">
               <span>${index + 1}</span>
               <div class="mini-actions">
-                <button type="button" data-action="rotate" title="Повернуть">
+                <button type="button" data-action="rotate" title="РџРѕРІРµСЂРЅСѓС‚СЊ">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 11a8 8 0 1 1-2.4-5.7M20 4v7h-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </button>
-                <button type="button" data-action="delete" title="Удалить">
+                <button type="button" data-action="delete" title="РЈРґР°Р»РёС‚СЊ">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 7h12M10 11v6M14 11v6M9 7l1-3h4l1 3M8 7l1 14h6l1-14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </button>
               </div>
@@ -2672,6 +2708,41 @@
         return state.pages.find(page => page.id === state.currentId) || null;
       }
 
+      function resetEditorZoom() {
+        state.editorZoom = 1;
+        state.editorPanX = 0;
+        state.editorPanY = 0;
+        updateZoomUi();
+      }
+
+      function updateZoomUi() {
+        if (!dom.zoomValue) return;
+        dom.zoomValue.value = `${Math.round(state.editorZoom * 100)}%`;
+        if (dom.zoomOutBtn) dom.zoomOutBtn.disabled = state.editorZoom <= 1.01;
+        if (dom.zoomInBtn) dom.zoomInBtn.disabled = state.editorZoom >= 5.99;
+      }
+
+      function clampEditorPan(baseW, baseH, stageW, stageH) {
+        const extraX = Math.max(0, (baseW * state.editorZoom - stageW) / 2);
+        const extraY = Math.max(0, (baseH * state.editorZoom - stageH) / 2);
+        state.editorPanX = clamp(state.editorPanX, -extraX, extraX);
+        state.editorPanY = clamp(state.editorPanY, -extraY, extraY);
+      }
+
+      function setEditorZoom(nextZoom, origin = null) {
+        const fit = state.editorFit;
+        const previousZoom = state.editorZoom;
+        state.editorZoom = clamp(nextZoom, 1, 6);
+        if (origin && fit && previousZoom !== state.editorZoom) {
+          const stageCx = fit.stageWidth / 2;
+          const stageCy = fit.stageHeight / 2;
+          state.editorPanX = origin.x - stageCx - (origin.x - stageCx - state.editorPanX) * state.editorZoom / previousZoom;
+          state.editorPanY = origin.y - stageCy - (origin.y - stageCy - state.editorPanY) * state.editorZoom / previousZoom;
+        }
+        updateZoomUi();
+        drawEditor();
+      }
+
       async function drawEditor() {
         const token = ++state.renderToken;
         const page = getCurrentPage();
@@ -2682,6 +2753,7 @@
           dom.editorEmpty.classList.remove("hidden");
           dom.cornerSvg.classList.remove("active");
           ctx.clearRect(0, 0, dom.editorCanvas.width, dom.editorCanvas.height);
+          resetEditorZoom();
           return;
         }
         stage.classList.remove("empty");
@@ -2691,7 +2763,7 @@
         if (!sourceUrl) {
           stage.classList.add("empty");
           dom.editorEmpty.classList.remove("hidden");
-          dom.editorEmpty.textContent = "Изображение страницы не найдено. Добавьте страницу заново.";
+          dom.editorEmpty.textContent = "РР·РѕР±СЂР°Р¶РµРЅРёРµ СЃС‚СЂР°РЅРёС†С‹ РЅРµ РЅР°Р№РґРµРЅРѕ. Р”РѕР±Р°РІСЊС‚Рµ СЃС‚СЂР°РЅРёС†Сѓ Р·Р°РЅРѕРІРѕ.";
           return;
         }
         const source = await loadImage(sourceUrl);
@@ -2702,15 +2774,20 @@
         dom.editorCanvas.height = Math.max(1, Math.round(rect.height * dpr));
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         ctx.clearRect(0, 0, rect.width, rect.height);
-        const scale = Math.min(rect.width / source.width, rect.height / source.height);
+        const baseScale = Math.min(rect.width / source.width, rect.height / source.height);
+        const baseW = source.width * baseScale;
+        const baseH = source.height * baseScale;
+        clampEditorPan(baseW, baseH, rect.width, rect.height);
+        const scale = baseScale * state.editorZoom;
         const w = source.width * scale;
         const h = source.height * scale;
-        const x = (rect.width - w) / 2;
-        const y = (rect.height - h) / 2;
+        const x = (rect.width - w) / 2 + state.editorPanX;
+        const y = (rect.height - h) / 2 + state.editorPanY;
         ctx.imageSmoothingEnabled = true;
         ctx.imageSmoothingQuality = "high";
         ctx.drawImage(source, x, y, w, h);
         state.editorFit = { x, y, w, h, scale, sourceWidth: source.width, sourceHeight: source.height, stageWidth: rect.width, stageHeight: rect.height };
+        updateZoomUi();
         updateCornerOverlay();
       }
 
@@ -2766,7 +2843,7 @@
         const page = getCurrentPage();
         if (!page || state.processing) return;
         state.processing = true;
-        if (!silent) showLoader("Обновление страницы");
+        if (!silent) showLoader("РћР±РЅРѕРІР»РµРЅРёРµ СЃС‚СЂР°РЅРёС†С‹");
         try {
           if (options.syncSettings) {
             page.filter = ensureFilterAllowed(state.settings.filter);
@@ -2778,10 +2855,10 @@
           await processPage(page);
           renderPages();
           await drawEditor();
-          if (!silent) toast("Страница обновлена.", "ok");
+          if (!silent) toast("РЎС‚СЂР°РЅРёС†Р° РѕР±РЅРѕРІР»РµРЅР°.", "ok");
         } catch (error) {
           console.error(error);
-          toast("Не удалось обработать страницу.", "danger");
+          toast("РќРµ СѓРґР°Р»РѕСЃСЊ РѕР±СЂР°Р±РѕС‚Р°С‚СЊ СЃС‚СЂР°РЅРёС†Сѓ.", "danger");
         } finally {
           state.processing = false;
           if (!silent) hideLoader();
@@ -2792,12 +2869,12 @@
         const page = getCurrentPage();
         if (!page || page.processingVersion === PROCESSING_VERSION || state.processing) return;
         state.processing = true;
-        showLoader("Обновление обработки");
+        showLoader("РћР±РЅРѕРІР»РµРЅРёРµ РѕР±СЂР°Р±РѕС‚РєРё");
         try {
           await processPage(page);
           renderPages();
           await drawEditor();
-          toast("Текущая страница обновлена новым алгоритмом.", "ok");
+          toast("РўРµРєСѓС‰Р°СЏ СЃС‚СЂР°РЅРёС†Р° РѕР±РЅРѕРІР»РµРЅР° РЅРѕРІС‹Рј Р°Р»РіРѕСЂРёС‚РјРѕРј.", "ok");
         } catch (error) {
           console.error(error);
         } finally {
@@ -2815,7 +2892,7 @@
           currentId: state.currentId,
           savedAt: Date.now()
         });
-        if (!ok) toast("Не удалось сохранить метаданные страниц. Изображения уже сохранены отдельно.", "warn");
+        if (!ok) toast("РќРµ СѓРґР°Р»РѕСЃСЊ СЃРѕС…СЂР°РЅРёС‚СЊ РјРµС‚Р°РґР°РЅРЅС‹Рµ СЃС‚СЂР°РЅРёС†. РР·РѕР±СЂР°Р¶РµРЅРёСЏ СѓР¶Рµ СЃРѕС…СЂР°РЅРµРЅС‹ РѕС‚РґРµР»СЊРЅРѕ.", "warn");
       }
 
       function persistSettings() {
@@ -2870,17 +2947,17 @@
           document.execCommand("copy");
           input.remove();
         }
-        toast(`${label} скопирован`, "ok");
+        toast(`${label} СЃРєРѕРїРёСЂРѕРІР°РЅ`, "ok");
       }
 
       async function activatePromo() {
         const input = normalizePromoCode(dom.promoInput.value);
         if (!input) {
-          toast("Введите промокод.", "warn");
+          toast("Р’РІРµРґРёС‚Рµ РїСЂРѕРјРѕРєРѕРґ.", "warn");
           return;
         }
         dom.activatePromoBtn.disabled = true;
-        showLoader("Проверка промокода");
+        showLoader("РџСЂРѕРІРµСЂРєР° РїСЂРѕРјРѕРєРѕРґР°");
         let item = null;
         let source = "local";
         try {
@@ -2888,17 +2965,17 @@
           item = codes.find(code => normalizePromoCode(code.code) === input) || null;
           if (item) {
             if (item.deleted) {
-              toast("Промокод удалён.", "danger");
+              toast("РџСЂРѕРјРѕРєРѕРґ СѓРґР°Р»С‘РЅ.", "danger");
               return;
             }
             if (item.expiresAt && Date.now() > item.expiresAt) {
-              toast("Срок действия промокода истёк.", "danger");
+              toast("РЎСЂРѕРє РґРµР№СЃС‚РІРёСЏ РїСЂРѕРјРѕРєРѕРґР° РёСЃС‚С‘Рє.", "danger");
               return;
             }
             const max = Number(item.maxActivations || 1);
             const used = Number(item.activations || 0);
             if (max > 0 && used >= max) {
-              toast("Лимит активаций промокода исчерпан локально.", "danger");
+              toast("Р›РёРјРёС‚ Р°РєС‚РёРІР°С†РёР№ РїСЂРѕРјРѕРєРѕРґР° РёСЃС‡РµСЂРїР°РЅ Р»РѕРєР°Р»СЊРЅРѕ.", "danger");
               return;
             }
             item.activations = used + 1;
@@ -2908,32 +2985,32 @@
             source = "public";
             const hash = await sha256Hex(input);
             if (!hash) {
-              toast("Браузер не поддерживает безопасную проверку промокода.", "danger");
+              toast("Р‘СЂР°СѓР·РµСЂ РЅРµ РїРѕРґРґРµСЂР¶РёРІР°РµС‚ Р±РµР·РѕРїР°СЃРЅСѓСЋ РїСЂРѕРІРµСЂРєСѓ РїСЂРѕРјРѕРєРѕРґР°.", "danger");
               return;
             }
             const publicDb = await fetchPublicPromoDb();
             if (!publicDb.ok) {
-              toast("Не удалось проверить промокод.", "danger");
+              toast("РќРµ СѓРґР°Р»РѕСЃСЊ РїСЂРѕРІРµСЂРёС‚СЊ РїСЂРѕРјРѕРєРѕРґ.", "danger");
               console.warn("Promo DB attempts", publicDb.attempts);
               return;
             }
             if (!publicDb.codes.length) {
-              toast("Промокод не найден.", "danger");
+              toast("РџСЂРѕРјРѕРєРѕРґ РЅРµ РЅР°Р№РґРµРЅ.", "danger");
               console.warn("Promo DB is empty", publicDb.url);
               return;
             }
             item = publicDb.codes.find(code => String(code.codeHash || code.hash || "").toLowerCase() === hash) || null;
             if (!item) {
-              toast("Промокод не найден.", "danger");
+              toast("РџСЂРѕРјРѕРєРѕРґ РЅРµ РЅР°Р№РґРµРЅ.", "danger");
               console.warn("Promo code hash mismatch", { url: publicDb.url, hash, count: publicDb.codes.length });
               return;
             }
             if (item.revoked || item.deleted) {
-              toast("Промокод отозван.", "danger");
+              toast("РџСЂРѕРјРѕРєРѕРґ РѕС‚РѕР·РІР°РЅ.", "danger");
               return;
             }
             if (item.expiresAt && Date.now() > Number(item.expiresAt)) {
-              toast("Срок действия промокода истёк.", "danger");
+              toast("РЎСЂРѕРє РґРµР№СЃС‚РІРёСЏ РїСЂРѕРјРѕРєРѕРґР° РёСЃС‚С‘Рє.", "danger");
               return;
             }
           }
@@ -2951,25 +3028,25 @@
         closeModal("promoModal");
         closeModal("premiumModal");
         renderAll();
-        toast("Premium активен.", "ok");
+        toast("Premium Р°РєС‚РёРІРµРЅ.", "ok");
       }
 
       async function applySettingsToAll(options = {}) {
         const silent = Boolean(options.silent);
         if (!state.pages.length) {
-          if (!silent) toast("Нет страниц для обработки.", "warn");
+          if (!silent) toast("РќРµС‚ СЃС‚СЂР°РЅРёС† РґР»СЏ РѕР±СЂР°Р±РѕС‚РєРё.", "warn");
           return;
         }
         if (state.processing) {
           if (silent) state.applyAllQueued = true;
-          else toast("Дождитесь завершения текущей обработки.", "warn");
+          else toast("Р”РѕР¶РґРёС‚РµСЃСЊ Р·Р°РІРµСЂС€РµРЅРёСЏ С‚РµРєСѓС‰РµР№ РѕР±СЂР°Р±РѕС‚РєРё.", "warn");
           return;
         }
         state.processing = true;
-        showLoader(silent ? "Обновление всех страниц" : "Применение ко всем");
+        showLoader(silent ? "РћР±РЅРѕРІР»РµРЅРёРµ РІСЃРµС… СЃС‚СЂР°РЅРёС†" : "РџСЂРёРјРµРЅРµРЅРёРµ РєРѕ РІСЃРµРј");
         try {
           for (let i = 0; i < state.pages.length; i++) {
-            dom.loaderText.textContent = `Страница ${i + 1} из ${state.pages.length}`;
+            dom.loaderText.textContent = `РЎС‚СЂР°РЅРёС†Р° ${i + 1} РёР· ${state.pages.length}`;
             state.pages[i].filter = ensureFilterAllowed(state.settings.filter);
             state.pages[i].adjustments = { ...state.settings.adjustments };
             await processPage(state.pages[i], { skipPersist: true });
@@ -2977,10 +3054,10 @@
           }
           persistPages();
           renderAll();
-          if (!silent) toast("Настройки применены ко всем страницам.", "ok");
+          if (!silent) toast("РќР°СЃС‚СЂРѕР№РєРё РїСЂРёРјРµРЅРµРЅС‹ РєРѕ РІСЃРµРј СЃС‚СЂР°РЅРёС†Р°Рј.", "ok");
         } catch (error) {
           console.error(error);
-          toast("Не удалось применить настройки ко всем страницам.", "danger");
+          toast("РќРµ СѓРґР°Р»РѕСЃСЊ РїСЂРёРјРµРЅРёС‚СЊ РЅР°СЃС‚СЂРѕР№РєРё РєРѕ РІСЃРµРј СЃС‚СЂР°РЅРёС†Р°Рј.", "danger");
         } finally {
           state.processing = false;
           hideLoader();
@@ -3000,16 +3077,16 @@
 
       async function downloadPdf() {
         if (!state.pages.length) {
-          toast("Нет страниц для PDF.", "warn");
+          toast("РќРµС‚ СЃС‚СЂР°РЅРёС† РґР»СЏ PDF.", "warn");
           return;
         }
         if (!window.jspdf?.jsPDF) {
-          toast("jsPDF ещё загружается. Повторите через секунду.", "warn");
+          toast("jsPDF РµС‰С‘ Р·Р°РіСЂСѓР¶Р°РµС‚СЃСЏ. РџРѕРІС‚РѕСЂРёС‚Рµ С‡РµСЂРµР· СЃРµРєСѓРЅРґСѓ.", "warn");
           return;
         }
         const filename = `scan_${formatFileDate(new Date())}.pdf`;
         state.processing = true;
-        showLoader("Сборка PDF");
+        showLoader("РЎР±РѕСЂРєР° PDF");
         try {
           const { jsPDF } = window.jspdf;
           const first = state.pages[0];
@@ -3019,13 +3096,13 @@
           for (let i = 0; i < state.pages.length; i++) {
             const page = state.pages[i];
             await hydratePageImages(page);
-            dom.loaderText.textContent = `PDF: страница ${i + 1} из ${state.pages.length}`;
+            dom.loaderText.textContent = `PDF: СЃС‚СЂР°РЅРёС†Р° ${i + 1} РёР· ${state.pages.length}`;
             let imageDataUrl = page.processedDataUrl;
             let imageWidth = page.width;
             let imageHeight = page.height;
             let transientCanvas = null;
             if (isPremium() && ensureFilterAllowed(page.filter) === "super") {
-              dom.loaderText.textContent = `${isIOSLike() ? "PDF iPhone SuperScan" : "PDF 8K SuperScan"}: страница ${i + 1} из ${state.pages.length}`;
+              dom.loaderText.textContent = `${isIOSLike() ? "PDF iPhone SuperScan" : "PDF 8K SuperScan"}: СЃС‚СЂР°РЅРёС†Р° ${i + 1} РёР· ${state.pages.length}`;
               transientCanvas = await renderPageCanvas(page, "pdf");
               imageDataUrl = canvasToJpeg(transientCanvas, .96);
               imageWidth = transientCanvas.width;
@@ -3060,7 +3137,7 @@
           await clearPagesAfterPdf();
         } catch (error) {
           console.error(error);
-          toast("Не удалось создать PDF.", "danger");
+          toast("РќРµ СѓРґР°Р»РѕСЃСЊ СЃРѕР·РґР°С‚СЊ PDF.", "danger");
         } finally {
           state.processing = false;
           hideLoader();
@@ -3100,7 +3177,7 @@
           try {
             if (navigator.canShare({ files: [file] })) {
               await navigator.share({ files: [file] });
-              toast("PDF передан в меню iPhone.", "ok");
+              toast("PDF РїРµСЂРµРґР°РЅ РІ РјРµРЅСЋ iPhone.", "ok");
               return;
             }
           } catch (error) {
@@ -3110,7 +3187,7 @@
 
         if (isIOSLike()) {
           openModal("pdfReadyModal");
-          toast("PDF готов. Нажмите «Открыть PDF» или «Поделиться».", "ok");
+          toast("PDF РіРѕС‚РѕРІ. РќР°Р¶РјРёС‚Рµ В«РћС‚РєСЂС‹С‚СЊ PDFВ» РёР»Рё В«РџРѕРґРµР»РёС‚СЊСЃСЏВ».", "ok");
           return;
         }
 
@@ -3120,7 +3197,7 @@
         document.body.appendChild(a);
         a.click();
         a.remove();
-        toast("PDF готов.", "ok");
+        toast("PDF РіРѕС‚РѕРІ.", "ok");
       }
 
       function bindEvents() {
@@ -3131,7 +3208,7 @@
         dom.stateUploadBtn.addEventListener("click", () => dom.fileInput.click());
         dom.nextScanBtn.addEventListener("click", () => {
           document.getElementById("cameraSection").scrollIntoView({ behavior: "smooth" });
-          toast("Камера готова к следующему скану.", "ok");
+          toast("РљР°РјРµСЂР° РіРѕС‚РѕРІР° Рє СЃР»РµРґСѓСЋС‰РµРјСѓ СЃРєР°РЅСѓ.", "ok");
         });
         dom.fileInput.addEventListener("change", event => {
           handleFiles(event.target.files);
@@ -3159,7 +3236,7 @@
         dom.promoInput.addEventListener("keydown", event => {
           if (event.key === "Enter") activatePromo();
         });
-        dom.copyCardBtn.addEventListener("click", () => copyText(dom.cardNumber.textContent.trim(), "Номер карты"));
+        dom.copyCardBtn.addEventListener("click", () => copyText(dom.cardNumber.textContent.trim(), "РќРѕРјРµСЂ РєР°СЂС‚С‹"));
         dom.copyEmailBtn.addEventListener("click", () => copyText(dom.supportEmail.textContent.trim(), "Email"));
         document.querySelectorAll("[data-close-modal]").forEach(button => {
           button.addEventListener("click", () => closeModal(button.dataset.closeModal));
@@ -3175,7 +3252,7 @@
           if (!button) return;
           const filter = button.dataset.filter;
           if (PREMIUM_FILTERS.has(filter) && !isPremium()) {
-            toast("Этот фильтр доступен в Premium.", "warn");
+            toast("Р­С‚РѕС‚ С„РёР»СЊС‚СЂ РґРѕСЃС‚СѓРїРµРЅ РІ Premium.", "warn");
             openModal("premiumModal");
             return;
           }
@@ -3211,12 +3288,12 @@
           persistPages();
           renderSliders();
           debouncedApplyAll();
-          toast("Настройки сброшены.", "ok");
+          toast("РќР°СЃС‚СЂРѕР№РєРё СЃР±СЂРѕС€РµРЅС‹.", "ok");
         });
         dom.saveStateBtn.addEventListener("click", () => {
           persistPages();
           persistSettings();
-          toast("Состояние сохранено.", "ok");
+          toast("РЎРѕСЃС‚РѕСЏРЅРёРµ СЃРѕС…СЂР°РЅРµРЅРѕ.", "ok");
         });
         dom.clearPagesBtn.addEventListener("click", () => {
           state.pages = [];
@@ -3224,12 +3301,12 @@
           imageDbClear();
           persistPages();
           renderAll();
-          toast("Страницы очищены.", "ok");
+          toast("РЎС‚СЂР°РЅРёС†С‹ РѕС‡РёС‰РµРЅС‹.", "ok");
         });
         dom.downloadPdfBtn.addEventListener("click", downloadPdf);
         dom.pdfShareBtn.addEventListener("click", async () => {
           if (!state.lastPdfFile) {
-            toast("Сначала создайте PDF.", "warn");
+            toast("РЎРЅР°С‡Р°Р»Р° СЃРѕР·РґР°Р№С‚Рµ PDF.", "warn");
             return;
           }
           if (navigator.canShare && navigator.share && navigator.canShare({ files: [state.lastPdfFile] })) {
@@ -3243,16 +3320,29 @@
           dom.pdfOpenLink.click();
         });
         dom.rotateCurrentBtn.addEventListener("click", rotateCurrentPage);
+        dom.zoomOutBtn.addEventListener("click", () => setEditorZoom(state.editorZoom / 1.25));
+        dom.zoomInBtn.addEventListener("click", () => setEditorZoom(state.editorZoom * 1.25));
+        dom.zoomResetBtn.addEventListener("click", () => {
+          resetEditorZoom();
+          drawEditor();
+        });
+        dom.editorStage.addEventListener("wheel", event => {
+          if (!getCurrentPage()) return;
+          event.preventDefault();
+          const rect = dom.editorStage.getBoundingClientRect();
+          const origin = { x: event.clientX - rect.left, y: event.clientY - rect.top };
+          setEditorZoom(state.editorZoom * (event.deltaY < 0 ? 1.16 : 1 / 1.16), origin);
+        }, { passive: false });
         dom.cornerModeBtn.addEventListener("click", () => {
           if (!getCurrentPage()) return;
           state.cropMode = !state.cropMode;
-          dom.cornerModeBtn.textContent = state.cropMode ? "Просмотр" : "Углы";
+          dom.cornerModeBtn.textContent = state.cropMode ? "РџСЂРѕСЃРјРѕС‚СЂ" : "РЈРіР»С‹";
           drawEditor();
         });
         dom.applyCornersBtn.addEventListener("click", () => {
           if (!getCurrentPage()) return;
           state.cropMode = false;
-          dom.cornerModeBtn.textContent = "Углы";
+          dom.cornerModeBtn.textContent = "РЈРіР»С‹";
           reprocessCurrent(false);
         });
 
@@ -3262,6 +3352,7 @@
           const pageId = card.dataset.id;
           const action = event.target.closest("button")?.dataset.action;
           state.currentId = pageId;
+          resetEditorZoom();
           const page = getCurrentPage();
           if (!page) return;
           if (action === "delete") {
@@ -3270,7 +3361,7 @@
             state.currentId = state.pages[0]?.id || null;
             persistPages();
             renderAll();
-            toast("Страница удалена.", "ok");
+            toast("РЎС‚СЂР°РЅРёС†Р° СѓРґР°Р»РµРЅР°.", "ok");
             return;
           }
           if (action === "rotate") {
@@ -3282,7 +3373,7 @@
           state.settings.filter = page.filter || state.settings.filter;
           state.settings.adjustments = { ...DEFAULT_ADJUSTMENTS, ...(page.adjustments || {}) };
           state.cropMode = false;
-          dom.cornerModeBtn.textContent = "Углы";
+          dom.cornerModeBtn.textContent = "РЈРіР»С‹";
           persistSettings();
           renderAll();
         });
@@ -3317,24 +3408,46 @@
 
         dom.cornerSvg.addEventListener("pointerdown", event => {
           const group = event.target.closest("g[data-index]");
-          if (!group) return;
-          state.draggingCorner = Number(group.dataset.index);
           dom.cornerSvg.setPointerCapture(event.pointerId);
-          setCornerFromStage(state.draggingCorner, svgPointFromEvent(event));
+          if (group) {
+            state.draggingCorner = Number(group.dataset.index);
+            setCornerFromStage(state.draggingCorner, svgPointFromEvent(event));
+            return;
+          }
+          if (state.editorZoom <= 1.01) return;
+          state.panningEditor = true;
+          state.panStart = {
+            x: event.clientX,
+            y: event.clientY,
+            panX: state.editorPanX,
+            panY: state.editorPanY
+          };
         });
         dom.cornerSvg.addEventListener("pointermove", event => {
-          if (state.draggingCorner === null) return;
+          if (state.draggingCorner !== null) {
+            event.preventDefault();
+            setCornerFromStage(state.draggingCorner, svgPointFromEvent(event));
+            return;
+          }
+          if (!state.panningEditor || !state.panStart) return;
           event.preventDefault();
-          setCornerFromStage(state.draggingCorner, svgPointFromEvent(event));
+          state.editorPanX = state.panStart.panX + event.clientX - state.panStart.x;
+          state.editorPanY = state.panStart.panY + event.clientY - state.panStart.y;
+          drawEditor();
         });
         dom.cornerSvg.addEventListener("pointerup", event => {
-          if (state.draggingCorner === null) return;
-          dom.cornerSvg.releasePointerCapture(event.pointerId);
-          state.draggingCorner = null;
-          persistPages();
+          if (state.draggingCorner !== null) {
+            state.draggingCorner = null;
+            persistPages();
+          }
+          state.panningEditor = false;
+          state.panStart = null;
+          if (dom.cornerSvg.hasPointerCapture(event.pointerId)) dom.cornerSvg.releasePointerCapture(event.pointerId);
         });
         dom.cornerSvg.addEventListener("pointercancel", () => {
           state.draggingCorner = null;
+          state.panningEditor = false;
+          state.panStart = null;
         });
 
         window.addEventListener("resize", debounce(drawEditor, 120));
