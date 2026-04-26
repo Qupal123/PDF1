@@ -2405,8 +2405,9 @@
         showLoader(corners ? "Выравнивание перспективы" : "Ручной режим");
         await processPage(page, { skipPersist: true });
         state.pages.push(page);
-        state.currentId = page.id;
-        if (!corners) {
+          state.currentId = page.id;
+          state.settings.filter = "original";
+          if (!corners) {
           state.cropMode = true;
           toast("Контур не найден. Проверьте углы вручную.", "warn");
         } else {
@@ -2761,14 +2762,19 @@
         updateCornerOverlay();
       }
 
-      async function reprocessCurrent(silent = false) {
+      async function reprocessCurrent(silent = false, options = {}) {
         const page = getCurrentPage();
         if (!page || state.processing) return;
         state.processing = true;
         if (!silent) showLoader("Обновление страницы");
         try {
-          page.filter = ensureFilterAllowed(state.settings.filter);
-          page.adjustments = { ...state.settings.adjustments };
+          if (options.syncSettings) {
+            page.filter = ensureFilterAllowed(state.settings.filter);
+            page.adjustments = { ...state.settings.adjustments };
+          } else {
+            page.filter = ensureFilterAllowed(page.filter || "original");
+            page.adjustments = { ...DEFAULT_ADJUSTMENTS, ...(page.adjustments || {}) };
+          }
           await processPage(page);
           renderPages();
           await drawEditor();
