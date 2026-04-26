@@ -2365,6 +2365,7 @@
         const targetMaxSide = renderMaxSideForMode(mode, context);
         const warpMaxSide = Math.min(targetMaxSide, Math.max(source.width, source.height));
         const cropped = warpPerspective(source, page.corners || defaultCorners(source.width, source.height), warpMaxSide);
+        if (mode === "original") return rotateCanvas(cropped, page.rotation || 0);
         const processed = processImage(cropped, mode, page.adjustments || state.settings.adjustments);
         const enhanced = mode === "super" ? upscaleCanvas(processed, targetMaxSide) : processed;
         return rotateCanvas(enhanced, page.rotation || 0);
@@ -2373,7 +2374,7 @@
       async function processPage(page, options = {}) {
         const mode = ensureFilterAllowed(page.filter || state.settings.filter);
         const rotated = await renderPageCanvas(page, "preview");
-        page.processedDataUrl = canvasToJpeg(rotated, isPremium() ? .94 : .84);
+        page.processedDataUrl = canvasToJpeg(rotated, mode === "original" ? .96 : (isPremium() ? .94 : .84));
         page.thumbDataUrl = makeThumb(rotated, 260);
         page.width = rotated.width;
         page.height = rotated.height;
@@ -2865,6 +2866,50 @@
         state.editorPanY =
           snapshot.center.y - state.editorFit.stageHeight / 2 -
           (start.center.y - state.editorFit.stageHeight / 2 - start.panY) * nextZoom / start.zoom;
+        updateZoomUi();
+        drawEditor();
+      }
+
+      function editorStageCenter(event = null) {
+        const fit = state.editorFit;
+        if (!fit) return null;
+        if (event && Number.isFinite(event.clientX) && Number.isFinite(event.clientY)) {
+          const rect = dom.editorStage.getBoundingClientRect();
+          return {
+            x: (event.clientX - rect.left) * fit.stageWidth / rect.width,
+            y: (event.clientY - rect.top) * fit.stageHeight / rect.height
+          };
+        }
+        return { x: fit.stageWidth / 2, y: fit.stageHeight / 2 };
+      }
+
+      function beginSafariGesture(event) {
+        if (!state.editorFit) return;
+        const center = editorStageCenter(event);
+        if (!center) return;
+        state.touchPinchStart = {
+          center,
+          distance: 1,
+          zoom: state.editorZoom,
+          panX: state.editorPanX,
+          panY: state.editorPanY
+        };
+        event.preventDefault();
+      }
+
+      function updateSafariGesture(event) {
+        if (!state.touchPinchStart) beginSafariGesture(event);
+        const start = state.touchPinchStart;
+        if (!start || !state.editorFit) return;
+        const nextZoom = clamp(start.zoom * (event.scale || 1), 1, 6);
+        state.editorZoom = nextZoom;
+        state.editorPanX =
+          start.center.x - state.editorFit.stageWidth / 2 -
+          (start.center.x - state.editorFit.stageWidth / 2 - start.panX) * nextZoom / start.zoom;
+        state.editorPanY =
+          start.center.y - state.editorFit.stageHeight / 2 -
+          (start.center.y - state.editorFit.stageHeight / 2 - start.panY) * nextZoom / start.zoom;
+        event.preventDefault();
         updateZoomUi();
         drawEditor();
       }
@@ -3459,22 +3504,30 @@
           const origin = { x: event.clientX - rect.left, y: event.clientY - rect.top };
           setEditorZoom(state.editorZoom * (event.deltaY < 0 ? 1.16 : 1 / 1.16), origin);
         }, { passive: false });
-        dom.editorStage.addEventListener("touchstart", event => {
+        const pinchTargets = [dom.editorStage, dom.cornerSvg];
+        pinchTargets.forEach(target => {
+          target.addEventListener("touchstart", event => {
           if (!getCurrentPage() || event.touches.length < 2) return;
           event.preventDefault();
           beginTouchPinch(event);
-        }, { passive: false });
-        dom.editorStage.addEventListener("touchmove", event => {
+          }, { passive: false });
+          target.addEventListener("touchmove", event => {
           if (!getCurrentPage() || event.touches.length < 2) return;
           event.preventDefault();
           updateTouchPinch(event);
-        }, { passive: false });
-        dom.editorStage.addEventListener("touchend", event => {
+          }, { passive: false });
+          target.addEventListener("touchend", event => {
           if (event.touches.length < 2) state.touchPinchStart = null;
-        }, { passive: false });
-        dom.editorStage.addEventListener("touchcancel", () => {
+          }, { passive: false });
+          target.addEventListener("touchcancel", () => {
           state.touchPinchStart = null;
-        }, { passive: false });
+          }, { passive: false });
+          target.addEventListener("gesturestart", beginSafariGesture, { passive: false });
+          target.addEventListener("gesturechange", updateSafariGesture, { passive: false });
+          target.addEventListener("gestureend", () => {
+            state.touchPinchStart = null;
+          }, { passive: false });
+        });
         dom.cornerModeBtn.addEventListener("click", () => {
           if (!getCurrentPage()) return;
           state.cropMode = !state.cropMode;
@@ -3482,9 +3535,15 @@
           drawEditor();
         });
         dom.applyCornersBtn.addEventListener("click", () => {
-          if (!getCurrentPage()) return;
+          const page = getCurrentPage();
+          if (!page) return;
+          page.filter = "original";
+          page.adjustments = { ...DEFAULT_ADJUSTMENTS };
+          state.settings.filter = "original";
           state.cropMode = false;
           dom.cornerModeBtn.textContent = "Углы";
+          persistSettings();
+          renderFilters();
           reprocessCurrent(false);
         });
 
