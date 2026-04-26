@@ -2103,23 +2103,14 @@
         for (let i = 0; i < mag.length; i++) mask[i] = mag[i] >= threshold ? 1 : 0;
         mask = dilate(mask, width, height, 2);
         const component = largestComponent(mask, width, height);
-        if (!component || component.count < width * height * .006) return null;
-        const boxW = component.maxX - component.minX;
-        const boxH = component.maxY - component.minY;
-        if (boxW < width * .24 || boxH < height * .24) return null;
-        const quad = orderCorners([
-          component.tl,
-          component.tr,
-          component.br,
-          component.bl
-        ]);
-        const area = polygonArea(quad);
-        if (area < width * height * .08) return null;
-        const marginHits =
-          (component.minX < 3 ? 1 : 0) + (component.minY < 3 ? 1 : 0) +
-          (component.maxX > width - 4 ? 1 : 0) + (component.maxY > height - 4 ? 1 : 0);
-        if (marginHits >= 3 && area > width * height * .9) return null;
-        return quad.map(p => ({ x: p.x / scale, y: p.y / scale }));
+        const edgeQuad = validateDetectedComponent(component, width, height, scale, {
+          minCountRatio: .006,
+          minBoxRatio: .24,
+          minAreaRatio: .08,
+          rejectAlmostFullFrame: true
+        });
+        if (edgeQuad) return edgeQuad;
+        return detectDocumentBySurface(gray, width, height, scale);
       }
 
       function dilate(mask, width, height, iterations) {
@@ -2140,6 +2131,96 @@
           current = next;
         }
         return current;
+      }
+
+      function erode(mask, width, height, iterations) {
+        let current = mask;
+        for (let iter = 0; iter < iterations; iter++) {
+          const next = new Uint8Array(width * height);
+          for (let y = 1; y < height - 1; y++) {
+            for (let x = 1; x < width - 1; x++) {
+              const i = y * width + x;
+              if (
+                current[i] && current[i - 1] && current[i + 1] &&
+                current[i - width] && current[i + width] &&
+                current[i - width - 1] && current[i - width + 1] &&
+                current[i + width - 1] && current[i + width + 1]
+              ) next[i] = 1;
+            }
+          }
+          current = next;
+        }
+        return current;
+      }
+
+      function validateDetectedComponent(component, width, height, scale, options = {}) {
+        if (!component || component.count < width * height * (options.minCountRatio ?? .015)) return null;
+        const boxW = component.maxX - component.minX;
+        const boxH = component.maxY - component.minY;
+        const minBoxRatio = options.minBoxRatio ?? .28;
+        if (boxW < width * minBoxRatio || boxH < height * minBoxRatio) return null;
+        const quad = orderCorners([component.tl, component.tr, component.br, component.bl]);
+        const area = polygonArea(quad);
+        if (area < width * height * (options.minAreaRatio ?? .12)) return null;
+        const marginHits =
+          (component.minX < 3 ? 1 : 0) + (component.minY < 3 ? 1 : 0) +
+          (component.maxX > width - 4 ? 1 : 0) + (component.maxY > height - 4 ? 1 : 0);
+        if (options.rejectAlmostFullFrame && marginHits >= 3 && area > width * height * .9) return null;
+        return quad.map(p => ({ x: p.x / scale, y: p.y / scale }));
+      }
+
+      function borderLumaMean(gray, width, height) {
+        const band = Math.max(4, Math.round(Math.min(width, height) * .055));
+        let sum = 0;
+        let count = 0;
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) {
+            if (x > band && x < width - band && y > band && y < height - band) continue;
+            sum += gray[y * width + x];
+            count++;
+          }
+        }
+        return count ? sum / count : 128;
+      }
+
+      function detectDocumentBySurface(gray, width, height, scale) {
+        const levels = histogramPercentiles(gray);
+        const borderMean = borderLumaMean(gray, width, height);
+        const candidates = [
+          {
+            type: "bright",
+            threshold: clamp(Math.max(borderMean + 18, levels.high - 70, levels.low + 38), 78, 238)
+          },
+          {
+            type: "bright",
+            threshold: clamp(Math.max(borderMean + 10, levels.high - 92), 64, 232)
+          },
+          {
+            type: "dark",
+            threshold: clamp(Math.min(borderMean - 18, levels.low + 76), 18, 178)
+          }
+        ];
+        let best = null;
+        for (const candidate of candidates) {
+          let mask = new Uint8Array(width * height);
+          for (let i = 0; i < gray.length; i++) {
+            mask[i] = candidate.type === "bright"
+              ? (gray[i] >= candidate.threshold ? 1 : 0)
+              : (gray[i] <= candidate.threshold ? 1 : 0);
+          }
+          mask = dilate(erode(mask, width, height, 1), width, height, 2);
+          const component = largestComponent(mask, width, height);
+          const quad = validateDetectedComponent(component, width, height, scale, {
+            minCountRatio: .045,
+            minBoxRatio: .32,
+            minAreaRatio: .13,
+            rejectAlmostFullFrame: false
+          });
+          if (!quad) continue;
+          const area = polygonArea(quad);
+          if (!best || area > best.area) best = { quad, area };
+        }
+        return best?.quad || null;
       }
 
       function largestComponent(mask, width, height) {
@@ -2915,6 +2996,7 @@
             await nextFrame();
           }
           await deliverPdf(pdf, filename);
+          await clearPagesAfterPdf();
         } catch (error) {
           console.error(error);
           toast("Не удалось создать PDF.", "danger");
@@ -2927,6 +3009,20 @@
       function formatFileDate(date) {
         const pad = n => String(n).padStart(2, "0");
         return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}_${pad(date.getHours())}-${pad(date.getMinutes())}`;
+      }
+
+      async function clearPagesAfterPdf() {
+        state.pages = [];
+        state.currentId = null;
+        state.cropMode = false;
+        state.draggingCorner = null;
+        try {
+          await imageDbClear();
+        } catch (error) {
+          console.warn("Clear images after PDF failed", error);
+        }
+        persistPages();
+        renderAll();
       }
 
       async function deliverPdf(pdf, filename) {
