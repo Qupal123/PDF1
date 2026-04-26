@@ -1136,7 +1136,7 @@
         draggingCorner: null,
         dragPageId: null,
         settings: {
-          filter: "color",
+          filter: "original",
           adjustments: { ...DEFAULT_ADJUSTMENTS }
         },
         premium: {
@@ -1879,6 +1879,8 @@
           gray[p] = d[i] * .299 + d[i + 1] * .587 + d[i + 2] * .114;
         }
 
+        if (mode === "original") return out;
+
         if (mode === "super") {
           applySuperScan(imageData, out.width, out.height, adjustments, gray);
           ctx.putImageData(imageData, 0, 0);
@@ -2395,7 +2397,7 @@
           originalWidth: normalized.width,
           originalHeight: normalized.height,
           corners: corners || defaultCorners(normalized.width, normalized.height, .035),
-          filter: ensureFilterAllowed(state.settings.filter),
+          filter: "original",
           adjustments: { ...state.settings.adjustments },
           rotation: 0,
           detection: corners ? "auto" : "manual"
@@ -2408,11 +2410,13 @@
           state.cropMode = true;
           toast("Контур не найден. Проверьте углы вручную.", "warn");
         } else {
-          state.cropMode = false;
+          state.cropMode = true;
           toast("Страница добавлена.", "ok");
         }
         persistPages();
         renderAll();
+        state.cropMode = true;
+        dom.cornerModeBtn.textContent = "Просмотр";
         hideLoader();
       }
 
@@ -2826,12 +2830,12 @@
         }
         const savedPremium = readStore(STORE.premium, null);
         if (savedPremium) state.premium = { ...state.premium, ...savedPremium };
-        if (!isPremium() && PREMIUM_FILTERS.has(state.settings.filter)) state.settings.filter = "color";
+        if (!isPremium() && PREMIUM_FILTERS.has(state.settings.filter)) state.settings.filter = "original";
         const savedPages = readStore(STORE.pages, null);
         if (savedPages?.pages?.length) {
           state.pages = savedPages.pages.slice(0, MAX_PAGES).map(page => ({
             ...page,
-            filter: ensureFilterAllowed(page.filter || "color"),
+            filter: ensureFilterAllowed(page.filter || "original"),
             adjustments: { ...DEFAULT_ADJUSTMENTS, ...(page.adjustments || {}) }
           }));
           for (const page of state.pages) await hydratePageImages(page);
