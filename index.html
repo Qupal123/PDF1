@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="ru">
 <head>
   <meta charset="utf-8">
@@ -817,15 +817,15 @@
           <div class="brand-mark"></div>
           <div class="brand-text">
             <div class="brand-title">PDF Scanner</div>
-            <div class="brand-subtitle">СЃРєР°РЅРёСЂРѕРІР°РЅРёРµ РґРѕРєСѓРјРµРЅС‚РѕРІ</div>
+            <div class="brand-subtitle">сканирование документов</div>
           </div>
         </div>
         <div class="topbar-spacer"></div>
         <button class="pill" id="premiumBtn" type="button" title="Premium">
           <span id="premiumBadge">Free</span>
         </button>
-        <div class="pill" title="РЎС‚СЂР°РЅРёС†С‹"><strong id="pageCount">0</strong><span>/ 25</span></div>
-        <button class="icon-button" id="themeBtn" type="button" title="РўРµРјР°" aria-label="РџРµСЂРµРєР»СЋС‡РёС‚СЊ С‚РµРјСѓ">
+        <div class="pill" title="Страницы"><strong id="pageCount">0</strong><span>/ 25</span></div>
+        <button class="icon-button" id="themeBtn" type="button" title="Тема" aria-label="Переключить тему">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path d="M12 3v2.2M12 18.8V21M4.2 4.2l1.6 1.6M18.2 18.2l1.6 1.6M3 12h2.2M18.8 12H21M4.2 19.8l1.6-1.6M18.2 5.8l1.6-1.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
             <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8"/>
@@ -836,31 +836,31 @@
       <div class="camera-state" id="cameraState">
         <div class="state-box">
           <div class="spinner" style="margin:0 auto 12px"></div>
-          <h2 id="cameraStateTitle">Р—Р°РїСѓСЃРє РєР°РјРµСЂС‹</h2>
-          <p id="cameraStateText">Р Р°Р·СЂРµС€РёС‚Рµ РґРѕСЃС‚СѓРї Рє РєР°РјРµСЂРµ. Р•СЃР»Рё РєР°РјРµСЂР° РЅРµРґРѕСЃС‚СѓРїРЅР°, РјРѕР¶РЅРѕ Р·Р°РіСЂСѓР·РёС‚СЊ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ С‡РµСЂРµР· РіР°Р»РµСЂРµСЋ РёР»Рё РїРµСЂРµС‚Р°С‰РёС‚СЊ С„Р°Р№Р»С‹.</p>
+          <h2 id="cameraStateTitle">Запуск камеры</h2>
+          <p id="cameraStateText">Разрешите доступ к камере. Если камера недоступна, можно загрузить изображения через галерею или перетащить файлы.</p>
           <div class="state-actions">
-            <button class="secondary" id="retryCameraBtn" type="button">РџРѕРІС‚РѕСЂРёС‚СЊ</button>
-            <button class="secondary" id="iosCaptureBtn" type="button">Р’С‹Р±СЂР°С‚СЊ/СЃРЅСЏС‚СЊ С„РѕС‚Рѕ</button>
-            <button class="primary" id="stateUploadBtn" type="button">Р’С‹Р±СЂР°С‚СЊ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ</button>
+            <button class="secondary" id="retryCameraBtn" type="button">Повторить</button>
+            <button class="secondary" id="iosCaptureBtn" type="button">Выбрать/снять фото</button>
+            <button class="primary" id="stateUploadBtn" type="button">Выбрать изображения</button>
           </div>
         </div>
       </div>
 
       <div class="capture-row">
-        <button class="quick-button" id="uploadBtn" type="button" title="Р“Р°Р»РµСЂРµСЏ">
+        <button class="quick-button" id="uploadBtn" type="button" title="Галерея">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v13a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 18.5v-13Z" stroke="currentColor" stroke-width="1.8"/>
             <path d="m5 17 4.5-4.5 3.3 3.3 2-2L20 19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
             <circle cx="15.5" cy="8" r="1.5" fill="currentColor"/>
           </svg>
-          <span>Р“Р°Р»РµСЂРµСЏ</span>
+          <span>Галерея</span>
         </button>
-        <button class="capture" id="captureBtn" type="button" aria-label="РЎРґРµР»Р°С‚СЊ СЃРЅРёРјРѕРє"></button>
-        <button class="quick-button" id="nextScanBtn" type="button" title="РЎР»РµРґСѓСЋС‰РёР№ СЃРєР°РЅ">
+        <button class="capture" id="captureBtn" type="button" aria-label="Сделать снимок"></button>
+        <button class="quick-button" id="nextScanBtn" type="button" title="Следующий скан">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-          <span>РЎР»РµРґСѓСЋС‰РёР№</span>
+          <span>Следующий</span>
         </button>
       </div>
     </section>
@@ -868,10 +868,10 @@
     <main class="workspace">
       <section class="section editor-section" id="editorSection">
         <div class="section-header">
-          <div class="section-title">Р РµРґР°РєС‚РѕСЂ</div>
-          <button class="secondary" id="cornerModeBtn" type="button">РЈРіР»С‹</button>
-          <button class="secondary" id="applyCornersBtn" type="button">РџСЂРёРјРµРЅРёС‚СЊ СѓРіР»С‹</button>
-          <button class="secondary" id="rotateCurrentBtn" type="button">РџРѕРІРµСЂРЅСѓС‚СЊ</button>
+          <div class="section-title">Редактор</div>
+          <button class="secondary" id="cornerModeBtn" type="button">Углы</button>
+          <button class="secondary" id="applyCornersBtn" type="button">Применить углы</button>
+          <button class="secondary" id="rotateCurrentBtn" type="button">Повернуть</button>
           <div class="zoom-controls" aria-label="Масштаб редактора">
             <button class="secondary" id="zoomOutBtn" type="button" title="Отдалить">-</button>
             <output id="zoomValue">100%</output>
@@ -886,29 +886,29 @@
             <polygon id="cornerPolygon" points=""></polygon>
             <g id="cornerHandles"></g>
           </svg>
-          <div id="editorEmpty">РЎРґРµР»Р°Р№С‚Рµ СЃРЅРёРјРѕРє РёР»Рё Р·Р°РіСЂСѓР·РёС‚Рµ РёР·РѕР±СЂР°Р¶РµРЅРёРµ. РЎС‚СЂР°РЅРёС†Р° РїРѕСЏРІРёС‚СЃСЏ Р·РґРµСЃСЊ РґР»СЏ РїСЂРѕРІРµСЂРєРё СѓРіР»РѕРІ Рё РѕР±СЂР°Р±РѕС‚РєРё.</div>
+          <div id="editorEmpty">Сделайте снимок или загрузите изображение. Страница появится здесь для проверки углов и обработки.</div>
         </div>
         <div class="controls">
           <div class="segment" id="filterSegment">
-            <button type="button" data-filter="original">РћСЂРёРіРёРЅР°Р»</button>
-            <button type="button" data-filter="color">Р¦РІРµС‚РЅРѕР№</button>
+            <button type="button" data-filter="original">Оригинал</button>
+            <button type="button" data-filter="color">Цветной</button>
             <button type="button" data-filter="gray">Grayscale</button>
-            <button type="button" data-filter="bw">Р§/Р‘ РґРѕРєСѓРјРµРЅС‚</button>
-            <button type="button" data-filter="super">РЎСѓРїРµСЂСЃРєР°РЅ</button>
+            <button type="button" data-filter="bw">Ч/Б документ</button>
+            <button type="button" data-filter="super">Суперскан</button>
           </div>
           <div class="sliders" id="sliders"></div>
           <div class="actions">
-            <button class="primary" id="applyAllBtn" type="button">РџСЂРёРјРµРЅРёС‚СЊ РєРѕ РІСЃРµРј</button>
-            <button class="secondary" id="resetSettingsBtn" type="button">РЎР±СЂРѕСЃРёС‚СЊ РЅР°СЃС‚СЂРѕР№РєРё</button>
-            <button class="secondary" id="saveStateBtn" type="button">РЎРѕС…СЂР°РЅРёС‚СЊ</button>
+            <button class="primary" id="applyAllBtn" type="button">Применить ко всем</button>
+            <button class="secondary" id="resetSettingsBtn" type="button">Сбросить настройки</button>
+            <button class="secondary" id="saveStateBtn" type="button">Сохранить</button>
           </div>
         </div>
       </section>
 
       <section class="section" id="gallerySection">
         <div class="section-header">
-          <div class="section-title">РЎС‚СЂР°РЅРёС†С‹</div>
-          <button class="secondary desktop-only" id="clearPagesBtn" type="button">РћС‡РёСЃС‚РёС‚СЊ</button>
+          <div class="section-title">Страницы</div>
+          <button class="secondary desktop-only" id="clearPagesBtn" type="button">Очистить</button>
         </div>
         <div class="grid" id="pagesGrid"></div>
       </section>
@@ -921,29 +921,29 @@
           <div class="pdf-row">
             <div>
               <strong>A4 PDF</strong><br>
-              <span id="pdfQualityText">Free: СЃС‚Р°РЅРґР°СЂС‚РЅРѕРµ РєР°С‡РµСЃС‚РІРѕ</span>
+              <span id="pdfQualityText">Free: стандартное качество</span>
             </div>
-            <button class="primary" id="downloadPdfBtn" type="button">РЎРєР°С‡Р°С‚СЊ PDF</button>
+            <button class="primary" id="downloadPdfBtn" type="button">Скачать PDF</button>
           </div>
           <div class="pdf-row">
             <div>
               <strong>Premium</strong><br>
-              <span>Р¦РІРµС‚РЅРѕР№ РЎСѓРїРµСЂСЃРєР°РЅ, 25 СЃС‚СЂР°РЅРёС†, РІСЃРµ С„РёР»СЊС‚СЂС‹, 4K-РїСЂРµРІСЊСЋ Рё PDF РґРѕ 8K</span>
+              <span>Цветной Суперскан, 25 страниц, все фильтры, 4K-превью и PDF до 8K</span>
             </div>
-            <button class="secondary" id="openPremiumBtn" type="button">РћС‚РєСЂС‹С‚СЊ</button>
+            <button class="secondary" id="openPremiumBtn" type="button">Открыть</button>
           </div>
         </div>
       </section>
     </main>
 
-    <nav class="bottom-nav" aria-label="РќР°РІРёРіР°С†РёСЏ">
+    <nav class="bottom-nav" aria-label="Навигация">
       <button type="button" data-jump="cameraSection" class="active">
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 8.5A2.5 2.5 0 0 1 6.5 6H8l1.3-2h5.4L16 6h1.5A2.5 2.5 0 0 1 20 8.5v8A2.5 2.5 0 0 1 17.5 19h-11A2.5 2.5 0 0 1 4 16.5v-8Z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12.5" r="3.4" stroke="currentColor" stroke-width="1.8"/></svg>
-        РљР°РјРµСЂР°
+        Камера
       </button>
       <button type="button" data-jump="gallerySection">
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 7h12v13H8zM4 4h12v3M4 4v13h4" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
-        Р“Р°Р»РµСЂРµСЏ
+        Галерея
       </button>
       <button type="button" data-jump="pdfSection">
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 3h7l4 4v14H7z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M14 3v5h5M9.5 14h5M9.5 17h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
@@ -958,8 +958,8 @@
   <div class="drop-catcher" id="dropCatcher">
     <div class="drop-card">
       <div>
-        <h2>РћС‚РїСѓСЃС‚РёС‚Рµ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ</h2>
-        <p>РџРѕРґРґРµСЂР¶РёРІР°СЋС‚СЃСЏ JPG, PNG, WEBP Рё BMP. Р”РѕРєСѓРјРµРЅС‚С‹ Р±СѓРґСѓС‚ РЅР°Р№РґРµРЅС‹ Рё РґРѕР±Р°РІР»РµРЅС‹ РІ РѕС‡РµСЂРµРґСЊ СЃРєР°РЅРёСЂРѕРІР°РЅРёСЏ.</p>
+        <h2>Отпустите изображения</h2>
+        <p>Поддерживаются JPG, PNG, WEBP и BMP. Документы будут найдены и добавлены в очередь сканирования.</p>
       </div>
     </div>
   </div>
@@ -967,32 +967,32 @@
   <div class="modal-backdrop" id="premiumModal" role="dialog" aria-modal="true" aria-labelledby="premiumTitle">
     <div class="modal">
       <div class="modal-header">
-        <h2 id="premiumTitle">Premium РґРѕСЃС‚СѓРї</h2>
-        <button class="icon-button" type="button" data-close-modal="premiumModal" aria-label="Р—Р°РєСЂС‹С‚СЊ">
+        <h2 id="premiumTitle">Premium доступ</h2>
+        <button class="icon-button" type="button" data-close-modal="premiumModal" aria-label="Закрыть">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
         </button>
       </div>
       <div class="modal-body">
         <div class="notice">
-          <strong>РћРїР»Р°С‚Р° РІСЂСѓС‡РЅСѓСЋ.</strong><br>
-          РџРµСЂРµРІРµРґРёС‚Рµ РѕРїР»Р°С‚Сѓ РЅР° РєР°СЂС‚Сѓ, Р·Р°С‚РµРј РѕС‚РїСЂР°РІСЊС‚Рµ СЃРєСЂРёРЅ РѕРїР»Р°С‚С‹ РЅР° email. РџРѕСЃР»Рµ РїСЂРѕРІРµСЂРєРё РІС‹ РїРѕР»СѓС‡РёС‚Рµ РїСЂРѕРјРѕРєРѕРґ.
+          <strong>Оплата вручную.</strong><br>
+          Переведите оплату на карту, затем отправьте скрин оплаты на email. После проверки вы получите промокод.
         </div>
         <div class="copy-row">
           <div>
-            <div class="soft-label">РљР°СЂС‚Р°</div>
+            <div class="soft-label">Карта</div>
             <div class="copy-value" id="cardNumber">2200 1546 4888 2743</div>
           </div>
-          <button class="secondary" id="copyCardBtn" type="button">РЎРєРѕРїРёСЂРѕРІР°С‚СЊ РєР°СЂС‚Сѓ</button>
+          <button class="secondary" id="copyCardBtn" type="button">Скопировать карту</button>
         </div>
         <div class="copy-row">
           <div>
             <div class="soft-label">Email</div>
             <div class="copy-value" id="supportEmail">supportpays@icloud.com</div>
           </div>
-          <button class="secondary" id="copyEmailBtn" type="button">РЎРєРѕРїРёСЂРѕРІР°С‚СЊ email</button>
+          <button class="secondary" id="copyEmailBtn" type="button">Скопировать email</button>
         </div>
-        <div class="notice" id="premiumStatusText">Free СЂРµР¶РёРј: 5 СЃС‚СЂР°РЅРёС†, СЃС‚Р°РЅРґР°СЂС‚РЅС‹Р№ PDF, Р±Р°Р·РѕРІС‹Рµ С„РёР»СЊС‚СЂС‹.</div>
-        <button class="primary" id="havePromoBtn" type="button">РЈ РјРµРЅСЏ РµСЃС‚СЊ РїСЂРѕРјРѕРєРѕРґ</button>
+        <div class="notice" id="premiumStatusText">Free режим: 5 страниц, стандартный PDF, базовые фильтры.</div>
+        <button class="primary" id="havePromoBtn" type="button">У меня есть промокод</button>
       </div>
     </div>
   </div>
@@ -1000,15 +1000,15 @@
   <div class="modal-backdrop" id="promoModal" role="dialog" aria-modal="true" aria-labelledby="promoTitle">
     <div class="modal">
       <div class="modal-header">
-        <h2 id="promoTitle">РђРєС‚РёРІР°С†РёСЏ РїСЂРѕРјРѕРєРѕРґР°</h2>
-        <button class="icon-button" type="button" data-close-modal="promoModal" aria-label="Р—Р°РєСЂС‹С‚СЊ">
+        <h2 id="promoTitle">Активация промокода</h2>
+        <button class="icon-button" type="button" data-close-modal="promoModal" aria-label="Закрыть">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
         </button>
       </div>
       <div class="modal-body">
         <div class="input-row">
           <input class="text-input" id="promoInput" type="text" inputmode="latin" autocomplete="one-time-code" placeholder="PDF-XXXX-XXXX-XXXX">
-          <button class="primary" id="activatePromoBtn" type="button">РђРєС‚РёРІРёСЂРѕРІР°С‚СЊ</button>
+          <button class="primary" id="activatePromoBtn" type="button">Активировать</button>
         </div>
       </div>
     </div>
@@ -1017,16 +1017,16 @@
   <div class="modal-backdrop" id="pdfReadyModal" role="dialog" aria-modal="true" aria-labelledby="pdfReadyTitle">
     <div class="modal">
       <div class="modal-header">
-        <h2 id="pdfReadyTitle">PDF РіРѕС‚РѕРІ</h2>
-        <button class="icon-button" type="button" data-close-modal="pdfReadyModal" aria-label="Р—Р°РєСЂС‹С‚СЊ">
+        <h2 id="pdfReadyTitle">PDF готов</h2>
+        <button class="icon-button" type="button" data-close-modal="pdfReadyModal" aria-label="Закрыть">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
         </button>
       </div>
       <div class="modal-body">
-        <div class="notice">РќР° iPhone РѕС‚РєСЂРѕР№С‚Рµ PDF Рё СЃРѕС…СЂР°РЅРёС‚Рµ РµРіРѕ С‡РµСЂРµР· РјРµРЅСЋ В«РџРѕРґРµР»РёС‚СЊСЃСЏВ» в†’ В«РЎРѕС…СЂР°РЅРёС‚СЊ РІ Р¤Р°Р№Р»С‹В».</div>
+        <div class="notice">На iPhone откройте PDF и сохраните его через меню «Поделиться» → «Сохранить в Файлы».</div>
         <div class="actions">
-          <a class="primary" id="pdfOpenLink" href="#" target="_blank" rel="noopener">РћС‚РєСЂС‹С‚СЊ PDF</a>
-          <button class="secondary" id="pdfShareBtn" type="button">РџРѕРґРµР»РёС‚СЊСЃСЏ</button>
+          <a class="primary" id="pdfOpenLink" href="#" target="_blank" rel="noopener">Открыть PDF</a>
+          <button class="secondary" id="pdfShareBtn" type="button">Поделиться</button>
         </div>
       </div>
     </div>
@@ -1035,7 +1035,7 @@
   <div class="loader" id="loader">
     <div class="loader-card">
       <div class="spinner"></div>
-      <div id="loaderText">РћР±СЂР°Р±РѕС‚РєР°</div>
+      <div id="loaderText">Обработка</div>
     </div>
   </div>
   <div class="toasts" id="toasts"></div>
@@ -1078,13 +1078,13 @@
       };
 
       const SLIDER_META = [
-        ["brightness", "РЇСЂРєРѕСЃС‚СЊ", -60, 70, 1],
-        ["contrast", "РљРѕРЅС‚СЂР°СЃС‚", -60, 90, 1],
-        ["sharpness", "Р РµР·РєРѕСЃС‚СЊ", 0, 100, 1],
+        ["brightness", "Яркость", -60, 70, 1],
+        ["contrast", "Контраст", -60, 90, 1],
+        ["sharpness", "Резкость", 0, 100, 1],
         ["threshold", "Threshold", -60, 60, 1],
-        ["saturation", "РќР°СЃС‹С‰РµРЅРЅРѕСЃС‚СЊ", -80, 80, 1],
-        ["temperature", "РўРµРјРїРµСЂР°С‚СѓСЂР°", -70, 70, 1],
-        ["shadows", "РЈРґР°Р»РµРЅРёРµ С‚РµРЅРµР№", 0, 100, 1]
+        ["saturation", "Насыщенность", -80, 80, 1],
+        ["temperature", "Температура", -70, 70, 1],
+        ["shadows", "Удаление теней", 0, 100, 1]
       ];
 
       const dom = {
@@ -1170,6 +1170,7 @@
         panStart: null,
         activePointers: new Map(),
         pinchStart: null,
+        touchPinchStart: null,
         draggingCorner: null,
         dragPageId: null,
         settings: {
@@ -1329,7 +1330,7 @@
         }, 3200);
       }
 
-      function showLoader(text = "РћР±СЂР°Р±РѕС‚РєР°") {
+      function showLoader(text = "Обработка") {
         dom.loaderText.textContent = text;
         dom.loader.classList.add("show");
       }
@@ -1547,14 +1548,14 @@
         return new Promise((resolve, reject) => {
           const image = new Image();
           image.onload = () => resolve(image);
-          image.onerror = () => reject(new Error("РќРµ СѓРґР°Р»РѕСЃСЊ РїСЂРѕС‡РёС‚Р°С‚СЊ РёР·РѕР±СЂР°Р¶РµРЅРёРµ"));
+          image.onerror = () => reject(new Error("Не удалось прочитать изображение"));
           image.src = src;
         });
       }
 
       async function fileToCanvas(file) {
         if (!/^image\//i.test(file.type)) {
-          throw new Error(`Р¤Р°Р№Р» ${file.name || ""} РЅРµ СЏРІР»СЏРµС‚СЃСЏ РїРѕРґРґРµСЂР¶РёРІР°РµРјС‹Рј РёР·РѕР±СЂР°Р¶РµРЅРёРµРј`);
+          throw new Error(`Файл ${file.name || ""} не является поддерживаемым изображением`);
         }
         if ("createImageBitmap" in window) {
           try {
@@ -1570,7 +1571,7 @@
         const dataUrl = await new Promise((resolve, reject) => {
           const reader = new FileReader();
           reader.onload = () => resolve(reader.result);
-          reader.onerror = () => reject(new Error("РќРµ СѓРґР°Р»РѕСЃСЊ РїСЂРѕС‡РёС‚Р°С‚СЊ С„Р°Р№Р»"));
+          reader.onerror = () => reject(new Error("Не удалось прочитать файл"));
           reader.readAsDataURL(file);
         });
         return canvasFromImage(await loadImage(dataUrl));
@@ -2357,7 +2358,7 @@
 
       async function renderPageCanvas(page, context = "preview") {
         if (!page.originalDataUrl) await hydratePageImages(page);
-        if (!page.originalDataUrl) throw new Error("РќРµ РЅР°Р№РґРµРЅ РѕСЂРёРіРёРЅР°Р» СЃС‚СЂР°РЅРёС†С‹");
+        if (!page.originalDataUrl) throw new Error("Не найден оригинал страницы");
         const image = await loadImage(page.originalDataUrl);
         const source = canvasFromImage(image);
         const mode = ensureFilterAllowed(page.filter || state.settings.filter);
@@ -2407,12 +2408,12 @@
 
       function canAddPage(showMessage = true) {
         if (state.pages.length >= MAX_PAGES) {
-          if (showMessage) toast("Р”РѕСЃС‚РёРіРЅСѓС‚ РјР°РєСЃРёРјСѓРј: 25 СЃС‚СЂР°РЅРёС†.", "warn");
+          if (showMessage) toast("Достигнут максимум: 25 страниц.", "warn");
           return false;
         }
         if (state.pages.length >= FREE_LIMIT && !isPremium()) {
           if (showMessage) {
-            toast("Р’ Free СЂРµР¶РёРјРµ РґРѕСЃС‚СѓРїРЅРѕ 5 СЃС‚СЂР°РЅРёС†. Р”Р»СЏ 25 СЃС‚СЂР°РЅРёС† РЅСѓР¶РµРЅ Premium.", "warn");
+            toast("В Free режиме доступно 5 страниц. Для 25 страниц нужен Premium.", "warn");
             openModal("premiumModal");
           }
           return false;
@@ -2420,9 +2421,9 @@
         return true;
       }
 
-      async function addPageFromCanvas(sourceCanvas, sourceLabel = "РЎРєР°РЅ") {
+      async function addPageFromCanvas(sourceCanvas, sourceLabel = "Скан") {
         if (!canAddPage()) return;
-        showLoader("РџРѕРёСЃРє РґРѕРєСѓРјРµРЅС‚Р°");
+        showLoader("Поиск документа");
         await nextFrame();
         const normalized = resizeCanvas(sourceCanvas, isPremium() ? ORIGINAL_PREMIUM_MAX_SIDE : ORIGINAL_FREE_MAX_SIDE);
         const corners = detectDocument(normalized);
@@ -2439,7 +2440,7 @@
           rotation: 0,
           detection: corners ? "auto" : "manual"
         };
-        showLoader(corners ? "Р’С‹СЂР°РІРЅРёРІР°РЅРёРµ РїРµСЂСЃРїРµРєС‚РёРІС‹" : "Р СѓС‡РЅРѕР№ СЂРµР¶РёРј");
+        showLoader(corners ? "Выравнивание перспективы" : "Ручной режим");
         await processPage(page, { skipPersist: true });
         state.pages.push(page);
           state.currentId = page.id;
@@ -2447,15 +2448,15 @@
           resetEditorZoom();
           if (!corners) {
           state.cropMode = true;
-          toast("РљРѕРЅС‚СѓСЂ РЅРµ РЅР°Р№РґРµРЅ. РџСЂРѕРІРµСЂСЊС‚Рµ СѓРіР»С‹ РІСЂСѓС‡РЅСѓСЋ.", "warn");
+          toast("Контур не найден. Проверьте углы вручную.", "warn");
         } else {
           state.cropMode = true;
-          toast("РЎС‚СЂР°РЅРёС†Р° РґРѕР±Р°РІР»РµРЅР°.", "ok");
+          toast("Страница добавлена.", "ok");
         }
         persistPages();
         renderAll();
         state.cropMode = true;
-        dom.cornerModeBtn.textContent = "РџСЂРѕСЃРјРѕС‚СЂ";
+        dom.cornerModeBtn.textContent = "Просмотр";
         hideLoader();
       }
 
@@ -2463,10 +2464,10 @@
         if (state.processing) return;
         if (!state.cameraReady || !dom.video.videoWidth) {
           if (state.cameraFallback) {
-            toast("Live-РєР°РјРµСЂР° РЅРµРґРѕСЃС‚СѓРїРЅР°. РќР°Р¶РјРёС‚Рµ В«Р’С‹Р±СЂР°С‚СЊ/СЃРЅСЏС‚СЊ С„РѕС‚РѕВ».", "warn");
+            toast("Live-камера недоступна. Нажмите «Выбрать/снять фото».", "warn");
             return;
           }
-          toast("РљР°РјРµСЂР° РµС‰С‘ РЅРµ РіРѕС‚РѕРІР°. РњРѕР¶РЅРѕ Р·Р°РіСЂСѓР·РёС‚СЊ РёР·РѕР±СЂР°Р¶РµРЅРёРµ РёР· РіР°Р»РµСЂРµРё.", "warn");
+          toast("Камера ещё не готова. Можно загрузить изображение из галереи.", "warn");
           return;
         }
         if (!canAddPage()) return;
@@ -2478,10 +2479,10 @@
         try {
           const canvas = createCanvas(dom.video.videoWidth, dom.video.videoHeight);
           canvas.getContext("2d", { willReadFrequently: true }).drawImage(dom.video, 0, 0);
-          await addPageFromCanvas(canvas, "РљР°РјРµСЂР°");
+          await addPageFromCanvas(canvas, "Камера");
         } catch (error) {
           console.error(error);
-          toast(error.message || "РќРµ СѓРґР°Р»РѕСЃСЊ СЃРґРµР»Р°С‚СЊ СЃРЅРёРјРѕРє", "danger");
+          toast(error.message || "Не удалось сделать снимок", "danger");
         } finally {
           state.processing = false;
           dom.captureBtn.disabled = false;
@@ -2497,19 +2498,19 @@
           if (!canAddPage()) break;
           state.processing = true;
           try {
-            showLoader(`Р—Р°РіСЂСѓР·РєР°: ${file.name || "РёР·РѕР±СЂР°Р¶РµРЅРёРµ"}`);
+            showLoader(`Загрузка: ${file.name || "изображение"}`);
             const canvas = await fileToCanvas(file);
-            await addPageFromCanvas(canvas, file.name || "РР·РѕР±СЂР°Р¶РµРЅРёРµ");
+            await addPageFromCanvas(canvas, file.name || "Изображение");
             added++;
           } catch (error) {
             console.error(error);
-            toast(error.message || "РќРµ СѓРґР°Р»РѕСЃСЊ Р·Р°РіСЂСѓР·РёС‚СЊ С„Р°Р№Р»", "danger");
+            toast(error.message || "Не удалось загрузить файл", "danger");
           } finally {
             state.processing = false;
             hideLoader();
           }
         }
-        if (added > 1) toast(`Р”РѕР±Р°РІР»РµРЅРѕ СЃС‚СЂР°РЅРёС†: ${added}`, "ok");
+        if (added > 1) toast(`Добавлено страниц: ${added}`, "ok");
       }
 
       async function startCamera() {
@@ -2518,13 +2519,13 @@
         state.cameraFallback = false;
         dom.captureBtn.disabled = true;
         dom.cameraState.classList.remove("hidden");
-        dom.cameraStateTitle.textContent = "Р—Р°РїСѓСЃРє РєР°РјРµСЂС‹";
-        dom.cameraStateText.textContent = "Р Р°Р·СЂРµС€РёС‚Рµ РґРѕСЃС‚СѓРї Рє РєР°РјРµСЂРµ. Р•СЃР»Рё РєР°РјРµСЂР° РЅРµРґРѕСЃС‚СѓРїРЅР°, РјРѕР¶РЅРѕ Р·Р°РіСЂСѓР·РёС‚СЊ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ С‡РµСЂРµР· РіР°Р»РµСЂРµСЋ РёР»Рё РїРµСЂРµС‚Р°С‰РёС‚СЊ С„Р°Р№Р»С‹.";
+        dom.cameraStateTitle.textContent = "Запуск камеры";
+        dom.cameraStateText.textContent = "Разрешите доступ к камере. Если камера недоступна, можно загрузить изображения через галерею или перетащить файлы.";
         try {
           if (needsHttpsForCamera()) {
-            throw new Error("Р”Р»СЏ РєР°РјРµСЂС‹ РЅР° iPhone Рё РґСЂСѓРіРёС… РјРѕР±РёР»СЊРЅС‹С… Р±СЂР°СѓР·РµСЂР°С… РЅСѓР¶РµРЅ HTTPS. РџРѕ http://192.168.x.x РєР°РјРµСЂР° Р±Р»РѕРєРёСЂСѓРµС‚СЃСЏ Р±СЂР°СѓР·РµСЂРѕРј.");
+            throw new Error("Для камеры на iPhone и других мобильных браузерах нужен HTTPS. По http://192.168.x.x камера блокируется браузером.");
           }
-          if (!navigator.mediaDevices?.getUserMedia) throw new Error("Р‘СЂР°СѓР·РµСЂ РЅРµ РїРѕРґРґРµСЂР¶РёРІР°РµС‚ РґРѕСЃС‚СѓРї Рє РєР°РјРµСЂРµ");
+          if (!navigator.mediaDevices?.getUserMedia) throw new Error("Браузер не поддерживает доступ к камере");
           const constraintList = [
             {
               audio: false,
@@ -2555,7 +2556,7 @@
               lastError = error;
             }
           }
-          if (!stream) throw lastError || new Error("РљР°РјРµСЂР° РЅРµ РѕС‚РєСЂС‹Р»Р°СЃСЊ");
+          if (!stream) throw lastError || new Error("Камера не открылась");
           state.stream = stream;
           dom.video.srcObject = stream;
           await dom.video.play();
@@ -2569,11 +2570,11 @@
           state.cameraFallback = true;
           dom.captureBtn.disabled = false;
           dom.cameraState.classList.remove("hidden");
-          dom.cameraStateTitle.textContent = "РљР°РјРµСЂР° РЅРµРґРѕСЃС‚СѓРїРЅР°";
+          dom.cameraStateTitle.textContent = "Камера недоступна";
           dom.cameraStateText.textContent = needsHttpsForCamera()
-            ? "Р’С‹ РѕС‚РєСЂС‹Р»Рё РїСЂРёР»РѕР¶РµРЅРёРµ РїРѕ РѕР±С‹С‡РЅРѕРјСѓ HTTP. РќР° iPhone live-РєР°РјРµСЂР° СЂР°Р±РѕС‚Р°РµС‚ С‚РѕР»СЊРєРѕ С‡РµСЂРµР· HTTPS. РќР°Р¶РјРёС‚Рµ В«Р’С‹Р±СЂР°С‚СЊ/СЃРЅСЏС‚СЊ С„РѕС‚РѕВ» Р»РёР±Рѕ Р·Р°РїСѓСЃС‚РёС‚Рµ Р»РѕРєР°Р»СЊРЅС‹Р№ HTTPS-СЃРµСЂРІРµСЂ."
-            : "РџСЂРѕРІРµСЂСЊС‚Рµ СЂР°Р·СЂРµС€РµРЅРёРµ Р±СЂР°СѓР·РµСЂР°. РњРѕР¶РЅРѕ РІС‹Р±СЂР°С‚СЊ/СЃРЅСЏС‚СЊ С„РѕС‚Рѕ СЃРёСЃС‚РµРјРЅС‹Рј РѕРєРЅРѕРј РёР»Рё Р·Р°РіСЂСѓР·РёС‚СЊ РёР·РѕР±СЂР°Р¶РµРЅРёРµ РІСЂСѓС‡РЅСѓСЋ.";
-          toast(error.message || "РљР°РјРµСЂР° РЅРµРґРѕСЃС‚СѓРїРЅР°. Р—Р°РіСЂСѓР·РєР° РёР·РѕР±СЂР°Р¶РµРЅРёР№ РѕСЃС‚Р°С‘С‚СЃСЏ РґРѕСЃС‚СѓРїРЅРѕР№.", "warn");
+            ? "Вы открыли приложение по обычному HTTP. На iPhone live-камера работает только через HTTPS. Нажмите «Выбрать/снять фото» либо запустите локальный HTTPS-сервер."
+            : "Проверьте разрешение браузера. Можно выбрать/снять фото системным окном или загрузить изображение вручную.";
+          toast(error.message || "Камера недоступна. Загрузка изображений остаётся доступной.", "warn");
         }
       }
 
@@ -2639,10 +2640,10 @@
         dom.premiumBadge.textContent = premium ? "Premium" : "Free";
         dom.premiumBtn.classList.toggle("ok", premium);
         dom.premiumBtn.classList.toggle("warn", !premium);
-        dom.pdfQualityText.textContent = premium ? "Premium: С†РІРµС‚РЅРѕР№ SuperScan РґРѕ 8K РІ PDF, РјРёРЅРёРјР°Р»СЊРЅРѕРµ СЃР¶Р°С‚РёРµ" : "Free: СЃС‚Р°РЅРґР°СЂС‚РЅРѕРµ РєР°С‡РµСЃС‚РІРѕ";
+        dom.pdfQualityText.textContent = premium ? "Premium: цветной SuperScan до 8K в PDF, минимальное сжатие" : "Free: стандартное качество";
         dom.premiumStatusText.textContent = premium
-          ? `Premium Р°РєС‚РёРІРµРЅ${state.premium.expiresAt ? ` РґРѕ ${new Date(state.premium.expiresAt).toLocaleDateString("ru-RU")}` : " РЅР°РІСЃРµРіРґР°"}.`
-          : "Free СЂРµР¶РёРј: 5 СЃС‚СЂР°РЅРёС†, СЃС‚Р°РЅРґР°СЂС‚РЅС‹Р№ PDF, Р±Р°Р·РѕРІС‹Рµ С„РёР»СЊС‚СЂС‹.";
+          ? `Premium активен${state.premium.expiresAt ? ` до ${new Date(state.premium.expiresAt).toLocaleDateString("ru-RU")}` : " навсегда"}.`
+          : "Free режим: 5 страниц, стандартный PDF, базовые фильтры.";
       }
 
       function renderFilters() {
@@ -2651,7 +2652,7 @@
           const locked = PREMIUM_FILTERS.has(filter) && !isPremium();
           button.classList.toggle("active", state.settings.filter === filter);
           button.classList.toggle("locked", locked);
-          button.title = locked ? "Р”РѕСЃС‚СѓРїРЅРѕ РІ Premium" : "";
+          button.title = locked ? "Доступно в Premium" : "";
         });
       }
 
@@ -2679,7 +2680,7 @@
         if (!state.pages.length) {
           const empty = document.createElement("div");
           empty.className = "empty-grid";
-          empty.textContent = "РџРѕРєР° РЅРµС‚ СЃС‚СЂР°РЅРёС†. РЎРЅРёРјРёС‚Рµ РґРѕРєСѓРјРµРЅС‚ РєР°РјРµСЂРѕР№ РёР»Рё РїРµСЂРµС‚Р°С‰РёС‚Рµ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ РІ РѕРєРЅРѕ.";
+          empty.textContent = "Пока нет страниц. Снимите документ камерой или перетащите изображения в окно.";
           dom.pagesGrid.appendChild(empty);
           return;
         }
@@ -2689,14 +2690,14 @@
           card.draggable = true;
           card.dataset.id = page.id;
           card.innerHTML = `
-            <div class="thumb-wrap"><img loading="lazy" src="${page.thumbDataUrl || page.processedDataUrl}" alt="РЎС‚СЂР°РЅРёС†Р° ${index + 1}"></div>
+            <div class="thumb-wrap"><img loading="lazy" src="${page.thumbDataUrl || page.processedDataUrl}" alt="Страница ${index + 1}"></div>
             <div class="page-meta">
               <span>${index + 1}</span>
               <div class="mini-actions">
-                <button type="button" data-action="rotate" title="РџРѕРІРµСЂРЅСѓС‚СЊ">
+                <button type="button" data-action="rotate" title="Повернуть">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 11a8 8 0 1 1-2.4-5.7M20 4v7h-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </button>
-                <button type="button" data-action="delete" title="РЈРґР°Р»РёС‚СЊ">
+                <button type="button" data-action="delete" title="Удалить">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 7h12M10 11v6M14 11v6M9 7l1-3h4l1 3M8 7l1 14h6l1-14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </button>
               </div>
@@ -2718,6 +2719,7 @@
         state.panStart = null;
         state.activePointers.clear();
         state.pinchStart = null;
+        state.touchPinchStart = null;
         updateZoomUi();
       }
 
@@ -2814,6 +2816,59 @@
         }
       }
 
+      function touchStagePoint(touch) {
+        const rect = dom.editorStage.getBoundingClientRect();
+        const fit = state.editorFit;
+        return {
+          x: (touch.clientX - rect.left) * fit.stageWidth / rect.width,
+          y: (touch.clientY - rect.top) * fit.stageHeight / rect.height
+        };
+      }
+
+      function touchPinchSnapshot(event) {
+        if (!state.editorFit || event.touches.length < 2) return null;
+        const a = touchStagePoint(event.touches[0]);
+        const b = touchStagePoint(event.touches[1]);
+        return {
+          center: {
+            x: (a.x + b.x) / 2,
+            y: (a.y + b.y) / 2
+          },
+          distance: Math.max(1, distance(a, b))
+        };
+      }
+
+      function beginTouchPinch(event) {
+        const snapshot = touchPinchSnapshot(event);
+        if (!snapshot) return;
+        state.draggingCorner = null;
+        state.panningEditor = false;
+        state.panStart = null;
+        state.touchPinchStart = {
+          ...snapshot,
+          zoom: state.editorZoom,
+          panX: state.editorPanX,
+          panY: state.editorPanY
+        };
+      }
+
+      function updateTouchPinch(event) {
+        if (!state.touchPinchStart) beginTouchPinch(event);
+        const start = state.touchPinchStart;
+        const snapshot = touchPinchSnapshot(event);
+        if (!start || !snapshot) return;
+        const nextZoom = clamp(start.zoom * snapshot.distance / start.distance, 1, 6);
+        state.editorZoom = nextZoom;
+        state.editorPanX =
+          snapshot.center.x - state.editorFit.stageWidth / 2 -
+          (start.center.x - state.editorFit.stageWidth / 2 - start.panX) * nextZoom / start.zoom;
+        state.editorPanY =
+          snapshot.center.y - state.editorFit.stageHeight / 2 -
+          (start.center.y - state.editorFit.stageHeight / 2 - start.panY) * nextZoom / start.zoom;
+        updateZoomUi();
+        drawEditor();
+      }
+
       async function drawEditor() {
         const token = ++state.renderToken;
         const page = getCurrentPage();
@@ -2834,7 +2889,7 @@
         if (!sourceUrl) {
           stage.classList.add("empty");
           dom.editorEmpty.classList.remove("hidden");
-          dom.editorEmpty.textContent = "РР·РѕР±СЂР°Р¶РµРЅРёРµ СЃС‚СЂР°РЅРёС†С‹ РЅРµ РЅР°Р№РґРµРЅРѕ. Р”РѕР±Р°РІСЊС‚Рµ СЃС‚СЂР°РЅРёС†Сѓ Р·Р°РЅРѕРІРѕ.";
+          dom.editorEmpty.textContent = "Изображение страницы не найдено. Добавьте страницу заново.";
           return;
         }
         const source = await loadImage(sourceUrl);
@@ -2914,7 +2969,7 @@
         const page = getCurrentPage();
         if (!page || state.processing) return;
         state.processing = true;
-        if (!silent) showLoader("РћР±РЅРѕРІР»РµРЅРёРµ СЃС‚СЂР°РЅРёС†С‹");
+        if (!silent) showLoader("Обновление страницы");
         try {
           if (options.syncSettings) {
             page.filter = ensureFilterAllowed(state.settings.filter);
@@ -2926,10 +2981,10 @@
           await processPage(page);
           renderPages();
           await drawEditor();
-          if (!silent) toast("РЎС‚СЂР°РЅРёС†Р° РѕР±РЅРѕРІР»РµРЅР°.", "ok");
+          if (!silent) toast("Страница обновлена.", "ok");
         } catch (error) {
           console.error(error);
-          toast("РќРµ СѓРґР°Р»РѕСЃСЊ РѕР±СЂР°Р±РѕС‚Р°С‚СЊ СЃС‚СЂР°РЅРёС†Сѓ.", "danger");
+          toast("Не удалось обработать страницу.", "danger");
         } finally {
           state.processing = false;
           if (!silent) hideLoader();
@@ -2940,12 +2995,12 @@
         const page = getCurrentPage();
         if (!page || page.processingVersion === PROCESSING_VERSION || state.processing) return;
         state.processing = true;
-        showLoader("РћР±РЅРѕРІР»РµРЅРёРµ РѕР±СЂР°Р±РѕС‚РєРё");
+        showLoader("Обновление обработки");
         try {
           await processPage(page);
           renderPages();
           await drawEditor();
-          toast("РўРµРєСѓС‰Р°СЏ СЃС‚СЂР°РЅРёС†Р° РѕР±РЅРѕРІР»РµРЅР° РЅРѕРІС‹Рј Р°Р»РіРѕСЂРёС‚РјРѕРј.", "ok");
+          toast("Текущая страница обновлена новым алгоритмом.", "ok");
         } catch (error) {
           console.error(error);
         } finally {
@@ -2963,7 +3018,7 @@
           currentId: state.currentId,
           savedAt: Date.now()
         });
-        if (!ok) toast("РќРµ СѓРґР°Р»РѕСЃСЊ СЃРѕС…СЂР°РЅРёС‚СЊ РјРµС‚Р°РґР°РЅРЅС‹Рµ СЃС‚СЂР°РЅРёС†. РР·РѕР±СЂР°Р¶РµРЅРёСЏ СѓР¶Рµ СЃРѕС…СЂР°РЅРµРЅС‹ РѕС‚РґРµР»СЊРЅРѕ.", "warn");
+        if (!ok) toast("Не удалось сохранить метаданные страниц. Изображения уже сохранены отдельно.", "warn");
       }
 
       function persistSettings() {
@@ -3018,17 +3073,17 @@
           document.execCommand("copy");
           input.remove();
         }
-        toast(`${label} СЃРєРѕРїРёСЂРѕРІР°РЅ`, "ok");
+        toast(`${label} скопирован`, "ok");
       }
 
       async function activatePromo() {
         const input = normalizePromoCode(dom.promoInput.value);
         if (!input) {
-          toast("Р’РІРµРґРёС‚Рµ РїСЂРѕРјРѕРєРѕРґ.", "warn");
+          toast("Введите промокод.", "warn");
           return;
         }
         dom.activatePromoBtn.disabled = true;
-        showLoader("РџСЂРѕРІРµСЂРєР° РїСЂРѕРјРѕРєРѕРґР°");
+        showLoader("Проверка промокода");
         let item = null;
         let source = "local";
         try {
@@ -3036,17 +3091,17 @@
           item = codes.find(code => normalizePromoCode(code.code) === input) || null;
           if (item) {
             if (item.deleted) {
-              toast("РџСЂРѕРјРѕРєРѕРґ СѓРґР°Р»С‘РЅ.", "danger");
+              toast("Промокод удалён.", "danger");
               return;
             }
             if (item.expiresAt && Date.now() > item.expiresAt) {
-              toast("РЎСЂРѕРє РґРµР№СЃС‚РІРёСЏ РїСЂРѕРјРѕРєРѕРґР° РёСЃС‚С‘Рє.", "danger");
+              toast("Срок действия промокода истёк.", "danger");
               return;
             }
             const max = Number(item.maxActivations || 1);
             const used = Number(item.activations || 0);
             if (max > 0 && used >= max) {
-              toast("Р›РёРјРёС‚ Р°РєС‚РёРІР°С†РёР№ РїСЂРѕРјРѕРєРѕРґР° РёСЃС‡РµСЂРїР°РЅ Р»РѕРєР°Р»СЊРЅРѕ.", "danger");
+              toast("Лимит активаций промокода исчерпан локально.", "danger");
               return;
             }
             item.activations = used + 1;
@@ -3056,32 +3111,32 @@
             source = "public";
             const hash = await sha256Hex(input);
             if (!hash) {
-              toast("Р‘СЂР°СѓР·РµСЂ РЅРµ РїРѕРґРґРµСЂР¶РёРІР°РµС‚ Р±РµР·РѕРїР°СЃРЅСѓСЋ РїСЂРѕРІРµСЂРєСѓ РїСЂРѕРјРѕРєРѕРґР°.", "danger");
+              toast("Браузер не поддерживает безопасную проверку промокода.", "danger");
               return;
             }
             const publicDb = await fetchPublicPromoDb();
             if (!publicDb.ok) {
-              toast("РќРµ СѓРґР°Р»РѕСЃСЊ РїСЂРѕРІРµСЂРёС‚СЊ РїСЂРѕРјРѕРєРѕРґ.", "danger");
+              toast("Не удалось проверить промокод.", "danger");
               console.warn("Promo DB attempts", publicDb.attempts);
               return;
             }
             if (!publicDb.codes.length) {
-              toast("РџСЂРѕРјРѕРєРѕРґ РЅРµ РЅР°Р№РґРµРЅ.", "danger");
+              toast("Промокод не найден.", "danger");
               console.warn("Promo DB is empty", publicDb.url);
               return;
             }
             item = publicDb.codes.find(code => String(code.codeHash || code.hash || "").toLowerCase() === hash) || null;
             if (!item) {
-              toast("РџСЂРѕРјРѕРєРѕРґ РЅРµ РЅР°Р№РґРµРЅ.", "danger");
+              toast("Промокод не найден.", "danger");
               console.warn("Promo code hash mismatch", { url: publicDb.url, hash, count: publicDb.codes.length });
               return;
             }
             if (item.revoked || item.deleted) {
-              toast("РџСЂРѕРјРѕРєРѕРґ РѕС‚РѕР·РІР°РЅ.", "danger");
+              toast("Промокод отозван.", "danger");
               return;
             }
             if (item.expiresAt && Date.now() > Number(item.expiresAt)) {
-              toast("РЎСЂРѕРє РґРµР№СЃС‚РІРёСЏ РїСЂРѕРјРѕРєРѕРґР° РёСЃС‚С‘Рє.", "danger");
+              toast("Срок действия промокода истёк.", "danger");
               return;
             }
           }
@@ -3099,25 +3154,25 @@
         closeModal("promoModal");
         closeModal("premiumModal");
         renderAll();
-        toast("Premium Р°РєС‚РёРІРµРЅ.", "ok");
+        toast("Premium активен.", "ok");
       }
 
       async function applySettingsToAll(options = {}) {
         const silent = Boolean(options.silent);
         if (!state.pages.length) {
-          if (!silent) toast("РќРµС‚ СЃС‚СЂР°РЅРёС† РґР»СЏ РѕР±СЂР°Р±РѕС‚РєРё.", "warn");
+          if (!silent) toast("Нет страниц для обработки.", "warn");
           return;
         }
         if (state.processing) {
           if (silent) state.applyAllQueued = true;
-          else toast("Р”РѕР¶РґРёС‚РµСЃСЊ Р·Р°РІРµСЂС€РµРЅРёСЏ С‚РµРєСѓС‰РµР№ РѕР±СЂР°Р±РѕС‚РєРё.", "warn");
+          else toast("Дождитесь завершения текущей обработки.", "warn");
           return;
         }
         state.processing = true;
-        showLoader(silent ? "РћР±РЅРѕРІР»РµРЅРёРµ РІСЃРµС… СЃС‚СЂР°РЅРёС†" : "РџСЂРёРјРµРЅРµРЅРёРµ РєРѕ РІСЃРµРј");
+        showLoader(silent ? "Обновление всех страниц" : "Применение ко всем");
         try {
           for (let i = 0; i < state.pages.length; i++) {
-            dom.loaderText.textContent = `РЎС‚СЂР°РЅРёС†Р° ${i + 1} РёР· ${state.pages.length}`;
+            dom.loaderText.textContent = `Страница ${i + 1} из ${state.pages.length}`;
             state.pages[i].filter = ensureFilterAllowed(state.settings.filter);
             state.pages[i].adjustments = { ...state.settings.adjustments };
             await processPage(state.pages[i], { skipPersist: true });
@@ -3125,10 +3180,10 @@
           }
           persistPages();
           renderAll();
-          if (!silent) toast("РќР°СЃС‚СЂРѕР№РєРё РїСЂРёРјРµРЅРµРЅС‹ РєРѕ РІСЃРµРј СЃС‚СЂР°РЅРёС†Р°Рј.", "ok");
+          if (!silent) toast("Настройки применены ко всем страницам.", "ok");
         } catch (error) {
           console.error(error);
-          toast("РќРµ СѓРґР°Р»РѕСЃСЊ РїСЂРёРјРµРЅРёС‚СЊ РЅР°СЃС‚СЂРѕР№РєРё РєРѕ РІСЃРµРј СЃС‚СЂР°РЅРёС†Р°Рј.", "danger");
+          toast("Не удалось применить настройки ко всем страницам.", "danger");
         } finally {
           state.processing = false;
           hideLoader();
@@ -3148,16 +3203,16 @@
 
       async function downloadPdf() {
         if (!state.pages.length) {
-          toast("РќРµС‚ СЃС‚СЂР°РЅРёС† РґР»СЏ PDF.", "warn");
+          toast("Нет страниц для PDF.", "warn");
           return;
         }
         if (!window.jspdf?.jsPDF) {
-          toast("jsPDF РµС‰С‘ Р·Р°РіСЂСѓР¶Р°РµС‚СЃСЏ. РџРѕРІС‚РѕСЂРёС‚Рµ С‡РµСЂРµР· СЃРµРєСѓРЅРґСѓ.", "warn");
+          toast("jsPDF ещё загружается. Повторите через секунду.", "warn");
           return;
         }
         const filename = `scan_${formatFileDate(new Date())}.pdf`;
         state.processing = true;
-        showLoader("РЎР±РѕСЂРєР° PDF");
+        showLoader("Сборка PDF");
         try {
           const { jsPDF } = window.jspdf;
           const first = state.pages[0];
@@ -3167,13 +3222,13 @@
           for (let i = 0; i < state.pages.length; i++) {
             const page = state.pages[i];
             await hydratePageImages(page);
-            dom.loaderText.textContent = `PDF: СЃС‚СЂР°РЅРёС†Р° ${i + 1} РёР· ${state.pages.length}`;
+            dom.loaderText.textContent = `PDF: страница ${i + 1} из ${state.pages.length}`;
             let imageDataUrl = page.processedDataUrl;
             let imageWidth = page.width;
             let imageHeight = page.height;
             let transientCanvas = null;
             if (isPremium() && ensureFilterAllowed(page.filter) === "super") {
-              dom.loaderText.textContent = `${isIOSLike() ? "PDF iPhone SuperScan" : "PDF 8K SuperScan"}: СЃС‚СЂР°РЅРёС†Р° ${i + 1} РёР· ${state.pages.length}`;
+              dom.loaderText.textContent = `${isIOSLike() ? "PDF iPhone SuperScan" : "PDF 8K SuperScan"}: страница ${i + 1} из ${state.pages.length}`;
               transientCanvas = await renderPageCanvas(page, "pdf");
               imageDataUrl = canvasToJpeg(transientCanvas, .96);
               imageWidth = transientCanvas.width;
@@ -3208,7 +3263,7 @@
           await clearPagesAfterPdf();
         } catch (error) {
           console.error(error);
-          toast("РќРµ СѓРґР°Р»РѕСЃСЊ СЃРѕР·РґР°С‚СЊ PDF.", "danger");
+          toast("Не удалось создать PDF.", "danger");
         } finally {
           state.processing = false;
           hideLoader();
@@ -3248,7 +3303,7 @@
           try {
             if (navigator.canShare({ files: [file] })) {
               await navigator.share({ files: [file] });
-              toast("PDF РїРµСЂРµРґР°РЅ РІ РјРµРЅСЋ iPhone.", "ok");
+              toast("PDF передан в меню iPhone.", "ok");
               return;
             }
           } catch (error) {
@@ -3258,7 +3313,7 @@
 
         if (isIOSLike()) {
           openModal("pdfReadyModal");
-          toast("PDF РіРѕС‚РѕРІ. РќР°Р¶РјРёС‚Рµ В«РћС‚РєСЂС‹С‚СЊ PDFВ» РёР»Рё В«РџРѕРґРµР»РёС‚СЊСЃСЏВ».", "ok");
+          toast("PDF готов. Нажмите «Открыть PDF» или «Поделиться».", "ok");
           return;
         }
 
@@ -3268,7 +3323,7 @@
         document.body.appendChild(a);
         a.click();
         a.remove();
-        toast("PDF РіРѕС‚РѕРІ.", "ok");
+        toast("PDF готов.", "ok");
       }
 
       function bindEvents() {
@@ -3279,7 +3334,7 @@
         dom.stateUploadBtn.addEventListener("click", () => dom.fileInput.click());
         dom.nextScanBtn.addEventListener("click", () => {
           document.getElementById("cameraSection").scrollIntoView({ behavior: "smooth" });
-          toast("РљР°РјРµСЂР° РіРѕС‚РѕРІР° Рє СЃР»РµРґСѓСЋС‰РµРјСѓ СЃРєР°РЅСѓ.", "ok");
+          toast("Камера готова к следующему скану.", "ok");
         });
         dom.fileInput.addEventListener("change", event => {
           handleFiles(event.target.files);
@@ -3307,7 +3362,7 @@
         dom.promoInput.addEventListener("keydown", event => {
           if (event.key === "Enter") activatePromo();
         });
-        dom.copyCardBtn.addEventListener("click", () => copyText(dom.cardNumber.textContent.trim(), "РќРѕРјРµСЂ РєР°СЂС‚С‹"));
+        dom.copyCardBtn.addEventListener("click", () => copyText(dom.cardNumber.textContent.trim(), "Номер карты"));
         dom.copyEmailBtn.addEventListener("click", () => copyText(dom.supportEmail.textContent.trim(), "Email"));
         document.querySelectorAll("[data-close-modal]").forEach(button => {
           button.addEventListener("click", () => closeModal(button.dataset.closeModal));
@@ -3323,7 +3378,7 @@
           if (!button) return;
           const filter = button.dataset.filter;
           if (PREMIUM_FILTERS.has(filter) && !isPremium()) {
-            toast("Р­С‚РѕС‚ С„РёР»СЊС‚СЂ РґРѕСЃС‚СѓРїРµРЅ РІ Premium.", "warn");
+            toast("Этот фильтр доступен в Premium.", "warn");
             openModal("premiumModal");
             return;
           }
@@ -3359,12 +3414,12 @@
           persistPages();
           renderSliders();
           debouncedApplyAll();
-          toast("РќР°СЃС‚СЂРѕР№РєРё СЃР±СЂРѕС€РµРЅС‹.", "ok");
+          toast("Настройки сброшены.", "ok");
         });
         dom.saveStateBtn.addEventListener("click", () => {
           persistPages();
           persistSettings();
-          toast("РЎРѕСЃС‚РѕСЏРЅРёРµ СЃРѕС…СЂР°РЅРµРЅРѕ.", "ok");
+          toast("Состояние сохранено.", "ok");
         });
         dom.clearPagesBtn.addEventListener("click", () => {
           state.pages = [];
@@ -3372,12 +3427,12 @@
           imageDbClear();
           persistPages();
           renderAll();
-          toast("РЎС‚СЂР°РЅРёС†С‹ РѕС‡РёС‰РµРЅС‹.", "ok");
+          toast("Страницы очищены.", "ok");
         });
         dom.downloadPdfBtn.addEventListener("click", downloadPdf);
         dom.pdfShareBtn.addEventListener("click", async () => {
           if (!state.lastPdfFile) {
-            toast("РЎРЅР°С‡Р°Р»Р° СЃРѕР·РґР°Р№С‚Рµ PDF.", "warn");
+            toast("Сначала создайте PDF.", "warn");
             return;
           }
           if (navigator.canShare && navigator.share && navigator.canShare({ files: [state.lastPdfFile] })) {
@@ -3404,16 +3459,32 @@
           const origin = { x: event.clientX - rect.left, y: event.clientY - rect.top };
           setEditorZoom(state.editorZoom * (event.deltaY < 0 ? 1.16 : 1 / 1.16), origin);
         }, { passive: false });
+        dom.editorStage.addEventListener("touchstart", event => {
+          if (!getCurrentPage() || event.touches.length < 2) return;
+          event.preventDefault();
+          beginTouchPinch(event);
+        }, { passive: false });
+        dom.editorStage.addEventListener("touchmove", event => {
+          if (!getCurrentPage() || event.touches.length < 2) return;
+          event.preventDefault();
+          updateTouchPinch(event);
+        }, { passive: false });
+        dom.editorStage.addEventListener("touchend", event => {
+          if (event.touches.length < 2) state.touchPinchStart = null;
+        }, { passive: false });
+        dom.editorStage.addEventListener("touchcancel", () => {
+          state.touchPinchStart = null;
+        }, { passive: false });
         dom.cornerModeBtn.addEventListener("click", () => {
           if (!getCurrentPage()) return;
           state.cropMode = !state.cropMode;
-          dom.cornerModeBtn.textContent = state.cropMode ? "РџСЂРѕСЃРјРѕС‚СЂ" : "РЈРіР»С‹";
+          dom.cornerModeBtn.textContent = state.cropMode ? "Просмотр" : "Углы";
           drawEditor();
         });
         dom.applyCornersBtn.addEventListener("click", () => {
           if (!getCurrentPage()) return;
           state.cropMode = false;
-          dom.cornerModeBtn.textContent = "РЈРіР»С‹";
+          dom.cornerModeBtn.textContent = "Углы";
           reprocessCurrent(false);
         });
 
@@ -3432,7 +3503,7 @@
             state.currentId = state.pages[0]?.id || null;
             persistPages();
             renderAll();
-            toast("РЎС‚СЂР°РЅРёС†Р° СѓРґР°Р»РµРЅР°.", "ok");
+            toast("Страница удалена.", "ok");
             return;
           }
           if (action === "rotate") {
@@ -3444,7 +3515,7 @@
           state.settings.filter = page.filter || state.settings.filter;
           state.settings.adjustments = { ...DEFAULT_ADJUSTMENTS, ...(page.adjustments || {}) };
           state.cropMode = false;
-          dom.cornerModeBtn.textContent = "РЈРіР»С‹";
+          dom.cornerModeBtn.textContent = "Углы";
           persistSettings();
           renderAll();
         });
@@ -3586,3 +3657,4 @@
   </script>
 </body>
 </html>
+
