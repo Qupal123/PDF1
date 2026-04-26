@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="ru">
 <head>
   <meta charset="utf-8">
@@ -1168,6 +1168,8 @@
         editorPanY: 0,
         panningEditor: false,
         panStart: null,
+        activePointers: new Map(),
+        pinchStart: null,
         draggingCorner: null,
         dragPageId: null,
         settings: {
@@ -2712,6 +2714,10 @@
         state.editorZoom = 1;
         state.editorPanX = 0;
         state.editorPanY = 0;
+        state.panningEditor = false;
+        state.panStart = null;
+        state.activePointers.clear();
+        state.pinchStart = null;
         updateZoomUi();
       }
 
@@ -2741,6 +2747,71 @@
         }
         updateZoomUi();
         drawEditor();
+      }
+
+      function pointerStagePoint(pointer) {
+        const rect = dom.cornerSvg.getBoundingClientRect();
+        const fit = state.editorFit;
+        return {
+          x: (pointer.clientX - rect.left) * fit.stageWidth / rect.width,
+          y: (pointer.clientY - rect.top) * fit.stageHeight / rect.height
+        };
+      }
+
+      function pinchSnapshot() {
+        const pointers = [...state.activePointers.values()];
+        if (pointers.length < 2) return null;
+        const a = pointerStagePoint(pointers[0]);
+        const b = pointerStagePoint(pointers[1]);
+        return {
+          center: {
+            x: (a.x + b.x) / 2,
+            y: (a.y + b.y) / 2
+          },
+          distance: Math.max(1, distance(a, b))
+        };
+      }
+
+      function beginPinch() {
+        const snapshot = pinchSnapshot();
+        if (!snapshot) return;
+        state.draggingCorner = null;
+        state.panningEditor = false;
+        state.panStart = null;
+        state.pinchStart = {
+          ...snapshot,
+          zoom: state.editorZoom,
+          panX: state.editorPanX,
+          panY: state.editorPanY
+        };
+      }
+
+      function updatePinch() {
+        if (!state.pinchStart) return;
+        const snapshot = pinchSnapshot();
+        if (!snapshot) return;
+        const previousZoom = state.editorZoom;
+        const nextZoom = clamp(state.pinchStart.zoom * snapshot.distance / state.pinchStart.distance, 1, 6);
+        state.editorZoom = nextZoom;
+        state.editorPanX =
+          snapshot.center.x - state.editorFit.stageWidth / 2 -
+          (state.pinchStart.center.x - state.editorFit.stageWidth / 2 - state.pinchStart.panX) * nextZoom / state.pinchStart.zoom;
+        state.editorPanY =
+          snapshot.center.y - state.editorFit.stageHeight / 2 -
+          (state.pinchStart.center.y - state.editorFit.stageHeight / 2 - state.pinchStart.panY) * nextZoom / state.pinchStart.zoom;
+        if (previousZoom !== state.editorZoom || Math.abs(snapshot.distance - state.pinchStart.distance) > .5) {
+          updateZoomUi();
+          drawEditor();
+        }
+      }
+
+      function clearPointerGesture(pointerId = null) {
+        if (pointerId !== null) state.activePointers.delete(pointerId);
+        if (state.activePointers.size < 2) state.pinchStart = null;
+        if (state.activePointers.size === 0) {
+          state.panningEditor = false;
+          state.panStart = null;
+        }
       }
 
       async function drawEditor() {
@@ -3408,7 +3479,15 @@
 
         dom.cornerSvg.addEventListener("pointerdown", event => {
           const group = event.target.closest("g[data-index]");
+          state.activePointers.set(event.pointerId, {
+            clientX: event.clientX,
+            clientY: event.clientY
+          });
           dom.cornerSvg.setPointerCapture(event.pointerId);
+          if (state.activePointers.size >= 2) {
+            beginPinch();
+            return;
+          }
           if (group) {
             state.draggingCorner = Number(group.dataset.index);
             setCornerFromStage(state.draggingCorner, svgPointFromEvent(event));
@@ -3424,6 +3503,17 @@
           };
         });
         dom.cornerSvg.addEventListener("pointermove", event => {
+          if (state.activePointers.has(event.pointerId)) {
+            state.activePointers.set(event.pointerId, {
+              clientX: event.clientX,
+              clientY: event.clientY
+            });
+          }
+          if (state.activePointers.size >= 2) {
+            event.preventDefault();
+            updatePinch();
+            return;
+          }
           if (state.draggingCorner !== null) {
             event.preventDefault();
             setCornerFromStage(state.draggingCorner, svgPointFromEvent(event));
@@ -3442,12 +3532,14 @@
           }
           state.panningEditor = false;
           state.panStart = null;
+          clearPointerGesture(event.pointerId);
           if (dom.cornerSvg.hasPointerCapture(event.pointerId)) dom.cornerSvg.releasePointerCapture(event.pointerId);
         });
-        dom.cornerSvg.addEventListener("pointercancel", () => {
+        dom.cornerSvg.addEventListener("pointercancel", event => {
           state.draggingCorner = null;
           state.panningEditor = false;
           state.panStart = null;
+          clearPointerGesture(event.pointerId);
         });
 
         window.addEventListener("resize", debounce(drawEditor, 120));
